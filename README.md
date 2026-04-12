@@ -140,6 +140,7 @@ Required Vercel environment variables:
 Deployment notes:
 - Vercel automatically detects FastAPI when `fastapi` is present in `requirements.txt`
 - Vercel serves files under `public/**` automatically
+- If `DATABASE_URL` is left at the local default on Vercel, the app now automatically rewrites it to `sqlite:////tmp/real_estate.db` so the serverless runtime can boot
 - A file-based SQLite database is acceptable for demo use but not for a production multi-instance deployment
 - For a shared hosted environment, move the database to Postgres or another managed database before real usage
 

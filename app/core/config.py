@@ -1,5 +1,7 @@
+import os
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +24,13 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    @model_validator(mode="after")
+    def adjust_serverless_defaults(self):
+        running_on_vercel = os.getenv("VERCEL") == "1"
+        if running_on_vercel and self.database_url == "sqlite:///./real_estate.db":
+            self.database_url = "sqlite:////tmp/real_estate.db"
+        return self
 
 
 @lru_cache
