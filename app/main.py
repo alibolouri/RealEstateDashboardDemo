@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.staticfiles import StaticFiles
@@ -67,3 +68,8 @@ async def add_dashboard_security_headers(request, call_next):
 app.include_router(api_router)
 app.include_router(dashboard_router)
 app.mount("/static", StaticFiles(directory="public/static"), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/dashboard/login")
