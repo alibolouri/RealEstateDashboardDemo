@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     session_secret: str = "change-this-local-session-secret"
     cookie_secure: bool = False
     session_max_age: int = 60 * 60 * 8
-    trusted_hosts: str = "127.0.0.1,localhost,testserver"
+    trusted_hosts: str = "127.0.0.1,localhost,testserver,*.vercel.app"
 
     model_config = SettingsConfigDict(
         env_file=".env",

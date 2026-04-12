@@ -104,6 +104,7 @@ Important environment values:
 - `ADMIN_PASSWORD`
 - `SESSION_SECRET`
 - `COOKIE_SECURE=false` for local HTTP usage
+- `TRUSTED_HOSTS=127.0.0.1,localhost,testserver,*.vercel.app`
 
 ### Run locally
 ```powershell
@@ -134,6 +135,7 @@ Required Vercel environment variables:
 - `ADMIN_PASSWORD`
 - `SESSION_SECRET`
 - `COOKIE_SECURE=true`
+- `TRUSTED_HOSTS=<your-vercel-domain>,*.vercel.app`
 
 Deployment notes:
 - Vercel automatically detects FastAPI when `fastapi` is present in `requirements.txt`
