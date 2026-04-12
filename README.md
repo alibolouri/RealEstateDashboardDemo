@@ -191,6 +191,21 @@ This endpoint now requires an authenticated admin session from the dashboard.
 python -m pytest
 ```
 
+### Run the browser smoke test
+This uses Playwright CLI against a running local server and checks the dashboard login, settings save, property filtering, and integration settings flow.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\playwright_smoke.ps1
+```
+
+Optional parameters:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\playwright_smoke.ps1 `
+  -BaseUrl http://127.0.0.1:8000 `
+  -Username admin `
+  -Password changeme-demo-only
+```
+
 Current coverage includes:
 - health endpoint
 - property filtering
