@@ -17,7 +17,7 @@ Core application areas:
 - `app/services`: business logic for search, routing, seeding, settings, integrations, and dashboard queries
 - `app/models`: SQLAlchemy ORM models for listings, realtors, leads, global settings, and integrations
 - `app/templates`: Jinja templates for the dashboard
-- `public/static`: CSS and favicon served locally and by Vercel
+- `app/static`: bundled CSS and favicon served by FastAPI
 - `seed/`: mock listings, realtors, and researched integration catalog data
 - `tests/`: API, dashboard, and security behavior coverage
 
@@ -119,8 +119,7 @@ python -m uvicorn app.main:app --reload
 ## Vercel Deployment
 This repository is structured to deploy to Vercel as a single FastAPI application:
 - `index.py` exports the top-level ASGI `app`
-- `public/static` contains static assets served directly by Vercel
-- `vercel.json` trims non-runtime files from the Python function bundle
+- `app/static` keeps dashboard assets inside the Python bundle
 
 Recommended deployment flow:
 ```powershell
@@ -139,7 +138,6 @@ Required Vercel environment variables:
 
 Deployment notes:
 - Vercel automatically detects FastAPI when `fastapi` is present in `requirements.txt`
-- Vercel serves files under `public/**` automatically
 - If `DATABASE_URL` is left at the local default on Vercel, the app now automatically rewrites it to `sqlite:////tmp/real_estate.db` so the serverless runtime can boot
 - A file-based SQLite database is acceptable for demo use but not for a production multi-instance deployment
 - For a shared hosted environment, move the database to Postgres or another managed database before real usage

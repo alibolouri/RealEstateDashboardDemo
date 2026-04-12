@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
@@ -14,6 +15,7 @@ from app.web.routes.dashboard import router as dashboard_router
 
 
 settings = get_settings()
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
 @asynccontextmanager
@@ -67,9 +69,14 @@ async def add_dashboard_security_headers(request, call_next):
 
 app.include_router(api_router)
 app.include_router(dashboard_router)
-app.mount("/static", StaticFiles(directory="public/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/", include_in_schema=False)
 def root():
     return RedirectResponse(url="/dashboard/login")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return RedirectResponse(url="/static/favicon.svg")
