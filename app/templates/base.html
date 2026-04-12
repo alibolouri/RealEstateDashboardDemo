@@ -12,10 +12,18 @@
     {% if active_page != 'login' %}
     <aside class="sidebar">
       <div class="brand-block">
-        <p class="eyebrow">Admin Console</p>
-        <h1>AI Real Estate Assistant</h1>
-        <p class="muted">Local demo dashboard</p>
+        <div class="brand-mark">
+          <div class="brand-seal">A</div>
+          <div class="brand-label">
+            <span class="brand-kicker">Editorial Console</span>
+            <h1>AI Real Estate Assistant</h1>
+          </div>
+        </div>
+        <p class="muted">Premium local operations dashboard for listings, routing, and connector readiness.</p>
       </div>
+      <div class="sidebar-divider"></div>
+      <div>
+        <p class="sidebar-section-title">Navigation</p>
       <nav class="sidebar-nav">
         <a href="/dashboard" class="{% if active_page == 'overview' %}active{% endif %}">Overview</a>
         <a href="/dashboard/properties" class="{% if active_page == 'properties' %}active{% endif %}">Properties</a>
@@ -26,6 +34,11 @@
         <a href="/dashboard/integrations" class="{% if active_page == 'integrations' %}active{% endif %}">Integrations</a>
         {% endif %}
       </nav>
+      </div>
+      <div class="sidebar-footnote">
+        <p class="eyebrow">Mode</p>
+        <p class="muted">Structured operational control without raw payloads or engineering-only screens.</p>
+      </div>
       <form method="post" action="/dashboard/logout" class="logout-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit" class="secondary-button full-width">Log Out</button>
@@ -34,6 +47,15 @@
     {% endif %}
 
     <main class="content-area">
+      {% if active_page != 'login' %}
+      <div class="content-topline">
+        <div>
+          <p class="eyebrow">Real Estate Operations</p>
+          <p class="muted">Editorial luxury dashboard for admin review, routing, and connector configuration.</p>
+        </div>
+        <span class="status-pill dark">{{ app_settings.dashboard_density|title if app_settings else "Comfortable" }} mode</span>
+      </div>
+      {% endif %}
       {% if flash %}
       <div class="flash flash-{{ flash.kind }}">
         <strong>{{ flash.kind|capitalize }}</strong>

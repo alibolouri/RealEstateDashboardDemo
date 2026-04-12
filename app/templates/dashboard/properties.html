@@ -7,11 +7,20 @@
   <div>
     <p class="eyebrow">Listing Inventory</p>
     <h2>Properties</h2>
-    <p class="muted">Filter the local listing dataset with structured controls.</p>
+    <p class="lede">Filter the local listing dataset through premium operational controls and review inventory in a cleaner listing ledger.</p>
+  </div>
+  <div class="page-actions">
+    <span class="status-pill neutral">{{ properties|length }} visible results</span>
   </div>
 </section>
 
-<section class="section-panel">
+<section class="section-panel tonal">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Structured Filters</p>
+      <h3>Refine the listing pool</h3>
+    </div>
+  </div>
   <form method="get" action="/dashboard/properties" class="filter-grid">
     <label>
       <span>City</span>
@@ -47,6 +56,12 @@
 </section>
 
 <section class="section-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Inventory Table</p>
+      <h3>Current matching properties</h3>
+    </div>
+  </div>
   <div class="table-shell">
     <table>
       <thead>
@@ -82,7 +97,7 @@
   </div>
 
   <div class="pagination-row">
-    <span>Page {{ current_page }} of {{ total_pages }}</span>
+    <span class="muted">Page {{ current_page }} of {{ total_pages }}</span>
   </div>
 </section>
 {% endblock %}

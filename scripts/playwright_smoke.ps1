@@ -63,9 +63,8 @@ async (page) => {
   await page.getByRole('textbox', { name: 'Password' }).fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
   await page.waitForURL('**/dashboard');
-  await page.getByRole('heading', { name: 'Dashboard Overview' }).waitFor();
   const metricsText = await page.locator('main').textContent();
-  if (!metricsText.includes('Properties') || !metricsText.includes('10')) {
+  if (!metricsText.includes('Premium control for listings, leads, and integrations.') || !metricsText.includes('Properties') || !metricsText.includes('10')) {
     throw new Error('Overview metrics did not render the expected property count.');
   }
   return 'Login and overview passed';
@@ -97,7 +96,7 @@ $PropertiesCheck = Compress-JavaScript @"
 async (page) => {
   const baseUrl = __BASE__;
   await page.goto(baseUrl + '/dashboard/properties', { waitUntil: 'networkidle' });
-  await page.getByRole('heading', { name: 'Properties' }).waitFor();
+  await page.getByRole('heading', { name: 'Properties', exact: true }).waitFor();
   await page.getByRole('textbox', { name: 'City' }).fill('Houston');
   await page.getByRole('spinbutton', { name: 'Bedrooms' }).fill('3');
   await page.getByRole('button', { name: 'Apply Filters' }).click();

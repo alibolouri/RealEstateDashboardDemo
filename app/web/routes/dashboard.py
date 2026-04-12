@@ -128,6 +128,11 @@ def dashboard_home(request: Request, db: Session = Depends(get_db)):
     integration_groups = []
     if settings_snapshot.feature_integrations_panel and settings_snapshot.feature_catalog_visibility:
         integration_groups = get_grouped_catalog_entries(db)
+    default_realtor_name = db.scalar(
+        select(Realtor.name).where(Realtor.id == settings_snapshot.default_realtor_id)
+    ) or "Not assigned"
+    metrics = get_dashboard_metrics(db)
+    metrics["default_realtor_name"] = default_realtor_name
 
     return templates.TemplateResponse(
         request,
@@ -136,7 +141,7 @@ def dashboard_home(request: Request, db: Session = Depends(get_db)):
             request,
             active_page="overview",
             db=db,
-            metrics=get_dashboard_metrics(db),
+            metrics=metrics,
             integration_groups=integration_groups,
         ),
     )

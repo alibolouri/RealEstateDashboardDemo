@@ -7,17 +7,18 @@
   <div>
     <p class="eyebrow">Research-Backed Connectors</p>
     <h2>Integration Catalog</h2>
-    <p class="muted">Review real-estate system categories and prepare connector settings without live execution.</p>
+    <p class="lede">Review future integration surfaces through a curated catalog designed for internal planning, partner conversations, and premium demos.</p>
   </div>
 </section>
 
 {% for category, entries in integration_groups %}
-<section class="section-panel">
-  <div class="section-heading">
+<section class="category-shell">
+  <div class="category-title">
     <div>
       <p class="eyebrow">Category</p>
       <h3>{{ category }}</h3>
     </div>
+    <span class="category-badge">{{ entries|length }} connectors</span>
   </div>
   <div class="card-grid">
     {% for item in entries %}
@@ -33,11 +34,11 @@
       </div>
       {% if show_catalog_details %}
       <p>{{ item.summary }}</p>
-      <dl class="detail-list compact">
-        <div><dt>Auth Model</dt><dd>{{ item.auth_model }}</dd></div>
-        <div><dt>Direction</dt><dd>{{ item.data_direction }}</dd></div>
-        <div><dt>Readiness</dt><dd>{{ item.readiness_status.replace('_', ' ')|title }}</dd></div>
-      </dl>
+      <div class="info-strip">
+        <span class="chip">{{ item.auth_model }}</span>
+        <span class="chip">{{ item.data_direction }}</span>
+        <span class="chip">{{ item.readiness_status.replace('_', ' ')|title }}</span>
+      </div>
       {% endif %}
       <a class="text-link" href="/dashboard/integrations/{{ item.id }}">Open connector settings</a>
     </article>

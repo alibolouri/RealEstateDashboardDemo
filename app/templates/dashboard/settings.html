@@ -7,7 +7,7 @@
   <div>
     <p class="eyebrow">Global Controls</p>
     <h2>Application Settings</h2>
-    <p class="muted">Update platform defaults and feature switches from structured form fields.</p>
+    <p class="lede">Tune platform defaults, routing preferences, and feature exposure through grouped administrative controls.</p>
   </div>
 </section>
 
@@ -15,61 +15,72 @@
   <form method="post" action="/dashboard/settings" class="stack-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-    <div class="form-grid">
-      <label>
-        <span>Fixed Platform Contact Number</span>
-        <input type="text" name="fixed_contact_number" value="{{ settings_record.fixed_contact_number }}" required>
-      </label>
+    <div class="field-group">
+      <section class="fieldset-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Platform Defaults</p>
+            <h3>Operational baselines</h3>
+          </div>
+        </div>
 
-      <label>
-        <span>Default Realtor</span>
-        <select name="default_realtor_id">
-          {% for realtor in realtors %}
-          <option value="{{ realtor.id }}" {% if settings_record.default_realtor_id == realtor.id %}selected{% endif %}>{{ realtor.name }}</option>
-          {% endfor %}
-        </select>
-      </label>
+        <div class="form-grid">
+          <label>
+            <span>Fixed Platform Contact Number</span>
+            <input type="text" name="fixed_contact_number" value="{{ settings_record.fixed_contact_number }}" required>
+          </label>
 
-      <label>
-        <span>Chat Result Limit</span>
-        <input type="number" min="1" max="20" name="chat_result_limit" value="{{ settings_record.chat_result_limit }}">
-      </label>
+          <label>
+            <span>Default Realtor</span>
+            <select name="default_realtor_id">
+              {% for realtor in realtors %}
+              <option value="{{ realtor.id }}" {% if settings_record.default_realtor_id == realtor.id %}selected{% endif %}>{{ realtor.name }}</option>
+              {% endfor %}
+            </select>
+          </label>
 
-      <label>
-        <span>Default Desired City Fallback</span>
-        <input type="text" name="default_desired_city_fallback" value="{{ settings_record.default_desired_city_fallback or '' }}">
-      </label>
+          <label>
+            <span>Chat Result Limit</span>
+            <input type="number" min="1" max="20" name="chat_result_limit" value="{{ settings_record.chat_result_limit }}">
+          </label>
 
-      <label>
-        <span>Dashboard Density</span>
-        <select name="dashboard_density">
-          {% for option in ["comfortable", "compact"] %}
-          <option value="{{ option }}" {% if settings_record.dashboard_density == option %}selected{% endif %}>{{ option|title }}</option>
-          {% endfor %}
-        </select>
-      </label>
+          <label>
+            <span>Default Desired City Fallback</span>
+            <input type="text" name="default_desired_city_fallback" value="{{ settings_record.default_desired_city_fallback or '' }}">
+          </label>
 
-      <label>
-        <span>Table Page Size</span>
-        <input type="number" min="5" max="50" name="dashboard_table_page_size" value="{{ settings_record.dashboard_table_page_size }}">
-      </label>
+          <label>
+            <span>Dashboard Density</span>
+            <select name="dashboard_density">
+              {% for option in ["comfortable", "compact"] %}
+              <option value="{{ option }}" {% if settings_record.dashboard_density == option %}selected{% endif %}>{{ option|title }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label>
+            <span>Table Page Size</span>
+            <input type="number" min="5" max="50" name="dashboard_table_page_size" value="{{ settings_record.dashboard_table_page_size }}">
+          </label>
+        </div>
+      </section>
+
+      <fieldset class="checkbox-fieldset">
+        <legend>Feature Toggles</legend>
+        <label class="checkbox-row">
+          <input type="checkbox" name="feature_integrations_panel" {% if settings_record.feature_integrations_panel %}checked{% endif %}>
+          <span>Show integrations panel</span>
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" name="feature_lead_routing_writes" {% if settings_record.feature_lead_routing_writes %}checked{% endif %}>
+          <span>Allow authenticated lead routing writes</span>
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" name="feature_catalog_visibility" {% if settings_record.feature_catalog_visibility %}checked{% endif %}>
+          <span>Show research catalog descriptions and docs links</span>
+        </label>
+      </fieldset>
     </div>
-
-    <fieldset class="checkbox-fieldset">
-      <legend>Feature Toggles</legend>
-      <label class="checkbox-row">
-        <input type="checkbox" name="feature_integrations_panel" {% if settings_record.feature_integrations_panel %}checked{% endif %}>
-        <span>Show integrations panel</span>
-      </label>
-      <label class="checkbox-row">
-        <input type="checkbox" name="feature_lead_routing_writes" {% if settings_record.feature_lead_routing_writes %}checked{% endif %}>
-        <span>Allow authenticated lead routing writes</span>
-      </label>
-      <label class="checkbox-row">
-        <input type="checkbox" name="feature_catalog_visibility" {% if settings_record.feature_catalog_visibility %}checked{% endif %}>
-        <span>Show research catalog descriptions and docs links</span>
-      </label>
-    </fieldset>
 
     <div class="form-actions">
       <button type="submit" class="primary-button">Save Settings</button>

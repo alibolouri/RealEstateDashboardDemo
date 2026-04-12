@@ -7,11 +7,20 @@
   <div>
     <p class="eyebrow">Lead Routing</p>
     <h2>Leads</h2>
-    <p class="muted">Review routed leads, destination realtors, and listing context.</p>
+    <p class="lede">Track routed demand, destination brokers, and listing context from a sharper operational view.</p>
+  </div>
+  <div class="page-actions">
+    <span class="status-pill {% if leads %}good{% else %}muted{% endif %}">{{ leads|length }} visible leads</span>
   </div>
 </section>
 
-<section class="section-panel">
+<section class="section-panel tonal">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Routing Filters</p>
+      <h3>Review the pipeline</h3>
+    </div>
+  </div>
   <form method="get" action="/dashboard/leads" class="filter-grid">
     <label>
       <span>Status</span>
@@ -34,6 +43,12 @@
 </section>
 
 <section class="section-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Lead Ledger</p>
+      <h3>Current routed inquiries</h3>
+    </div>
+  </div>
   <div class="table-shell">
     <table>
       <thead>
@@ -69,7 +84,7 @@
   </div>
 
   <div class="pagination-row">
-    <span>Page {{ current_page }} of {{ total_pages }}</span>
+    <span class="muted">Page {{ current_page }} of {{ total_pages }}</span>
   </div>
 </section>
 {% endblock %}

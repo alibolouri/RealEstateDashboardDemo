@@ -7,7 +7,7 @@
   <div>
     <p class="eyebrow">{{ catalog.category }}</p>
     <h2>{{ catalog.service_name }}</h2>
-    <p class="muted">{{ catalog.vendor_name }}</p>
+    <p class="lede">{{ catalog.vendor_name }}</p>
   </div>
   <a class="secondary-button" href="/dashboard/integrations">Back to integrations</a>
 </section>
@@ -34,7 +34,12 @@
 </section>
 
 <section class="section-panel">
-  <h3>Connector Settings</h3>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Configuration Surface</p>
+      <h3>Connector Settings</h3>
+    </div>
+  </div>
   <form method="post" action="/dashboard/integrations/{{ catalog.id }}" class="stack-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 

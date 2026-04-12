@@ -7,7 +7,7 @@
   <div>
     <p class="eyebrow">Property Detail</p>
     <h2>{{ property_record.title }}</h2>
-    <p class="muted">{{ property_record.address }}, {{ property_record.city }}, {{ property_record.state }} {{ property_record.zip_code }}</p>
+    <p class="lede">{{ property_record.address }}, {{ property_record.city }}, {{ property_record.state }} {{ property_record.zip_code }}</p>
   </div>
   <a class="secondary-button" href="/dashboard/properties">Back to properties</a>
 </section>
@@ -17,7 +17,7 @@
     <h3>Listing Summary</h3>
     <dl class="detail-list">
       <div><dt>Price</dt><dd>${{ "{:,.0f}".format(property_record.price) }}</dd></div>
-      <div><dt>Status</dt><dd>{{ property_record.status.replace('_', ' ')|title }}</dd></div>
+      <div><dt>Status</dt><dd><span class="status-pill {{ property_record.status|status_tone }}">{{ property_record.status.replace('_', ' ')|title }}</span></dd></div>
       <div><dt>Type</dt><dd>{{ property_record.property_type|title }}</dd></div>
       <div><dt>Bedrooms</dt><dd>{{ property_record.bedrooms }}</dd></div>
       <div><dt>Bathrooms</dt><dd>{{ property_record.bathrooms }}</dd></div>
@@ -36,12 +36,22 @@
 </section>
 
 <section class="section-panel">
-  <h3>Description</h3>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Listing Narrative</p>
+      <h3>Description</h3>
+    </div>
+  </div>
   <p>{{ property_record.short_description }}</p>
-  <h3>Amenities</h3>
-  <ul class="structured-list columns">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Lifestyle Details</p>
+      <h3>Amenities</h3>
+    </div>
+  </div>
+  <ul class="chip-list">
     {% for amenity in property_record.amenities %}
-    <li>{{ amenity }}</li>
+    <li class="chip">{{ amenity }}</li>
     {% endfor %}
   </ul>
 </section>

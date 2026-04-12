@@ -7,7 +7,7 @@
   <div>
     <p class="eyebrow">Lead Detail</p>
     <h2>{{ lead.user_name }}</h2>
-    <p class="muted">{{ lead.user_email }} · {{ lead.user_phone }}</p>
+    <p class="lede">{{ lead.user_email }} | {{ lead.user_phone }}</p>
   </div>
   <a class="secondary-button" href="/dashboard/leads">Back to leads</a>
 </section>
@@ -16,7 +16,7 @@
   <article class="panel-card">
     <h3>Lead Information</h3>
     <dl class="detail-list">
-      <div><dt>Status</dt><dd>{{ lead.status|title }}</dd></div>
+      <div><dt>Status</dt><dd><span class="status-pill {{ lead.status|status_tone }}">{{ lead.status|title }}</span></dd></div>
       <div><dt>Desired City</dt><dd>{{ lead.desired_city or "Not specified" }}</dd></div>
       <div><dt>Desired Budget</dt><dd>{{ "$" ~ "{:,.0f}".format(lead.desired_budget) if lead.desired_budget else "Not specified" }}</dd></div>
       <div><dt>Created</dt><dd>{{ lead.created_at|datetime }}</dd></div>
@@ -34,7 +34,12 @@
 </section>
 
 <section class="section-panel">
-  <h3>Question</h3>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Inquiry Context</p>
+      <h3>Question</h3>
+    </div>
+  </div>
   <p>{{ lead.user_question }}</p>
 </section>
 {% endblock %}

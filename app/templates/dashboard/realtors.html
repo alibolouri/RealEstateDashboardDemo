@@ -7,11 +7,20 @@
   <div>
     <p class="eyebrow">Routing Team</p>
     <h2>Realtors</h2>
-    <p class="muted">Browse covered cities, specialties, and contact details.</p>
+    <p class="lede">Browse city coverage, specialties, and contact details in a roster designed for clean operational review.</p>
+  </div>
+  <div class="page-actions">
+    <span class="status-pill neutral">{{ realtors|length }} visible profiles</span>
   </div>
 </section>
 
-<section class="section-panel">
+<section class="section-panel tonal">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Coverage Filter</p>
+      <h3>Match the routing bench</h3>
+    </div>
+  </div>
   <form method="get" action="/dashboard/realtors" class="filter-grid">
     <label>
       <span>City Coverage</span>
@@ -25,6 +34,12 @@
 </section>
 
 <section class="section-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Roster</p>
+      <h3>Available realtors</h3>
+    </div>
+  </div>
   <div class="table-shell">
     <table>
       <thead>
@@ -52,7 +67,7 @@
     </table>
   </div>
   <div class="pagination-row">
-    <span>Page {{ current_page }} of {{ total_pages }}</span>
+    <span class="muted">Page {{ current_page }} of {{ total_pages }}</span>
   </div>
 </section>
 {% endblock %}
