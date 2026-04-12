@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Properties{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Listing Inventory</p>
+    <h2>Properties</h2>
+    <p class="muted">Filter the local listing dataset with structured controls.</p>
+  </div>
+</section>
+
+<section class="section-panel">
+  <form method="get" action="/dashboard/properties" class="filter-grid">
+    <label>
+      <span>City</span>
+      <input type="text" name="city" value="{{ filters.city or '' }}">
+    </label>
+    <label>
+      <span>Status</span>
+      <select name="status_value">
+        <option value="">All statuses</option>
+        {% for option in ["for_sale", "for_rent", "sold", "pending"] %}
+        <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option.replace('_', ' ')|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Property Type</span>
+      <select name="property_type">
+        <option value="">All types</option>
+        {% for option in ["house", "condo", "townhouse", "apartment"] %}
+        <option value="{{ option }}" {% if filters.property_type == option %}selected{% endif %}>{{ option|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span>Bedrooms</span>
+      <input type="number" min="1" name="bedrooms" value="{{ filters.bedrooms or '' }}">
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="primary-button">Apply Filters</button>
+      <a class="secondary-button" href="/dashboard/properties">Reset</a>
+    </div>
+  </form>
+</section>
+
+<section class="section-panel">
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Listing</th>
+          <th>Location</th>
+          <th>Price</th>
+          <th>Beds / Baths</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for property in properties %}
+        <tr>
+          <td>
+            <strong>{{ property.title }}</strong>
+            <div class="muted">{{ property.property_type|title }}</div>
+          </td>
+          <td>{{ property.city }}, {{ property.state }}</td>
+          <td>${{ "{:,.0f}".format(property.price) }}</td>
+          <td>{{ property.bedrooms }} bd / {{ property.bathrooms }} ba</td>
+          <td><span class="status-pill {{ property.status|status_tone }}">{{ property.status.replace('_', ' ')|title }}</span></td>
+          <td><a class="text-link" href="/dashboard/properties/{{ property.id }}">View details</a></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="empty-state">No properties match the current filters.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-row">
+    <span>Page {{ current_page }} of {{ total_pages }}</span>
+  </div>
+</section>
+{% endblock %}

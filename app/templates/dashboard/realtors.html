@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Realtors{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Routing Team</p>
+    <h2>Realtors</h2>
+    <p class="muted">Browse covered cities, specialties, and contact details.</p>
+  </div>
+</section>
+
+<section class="section-panel">
+  <form method="get" action="/dashboard/realtors" class="filter-grid">
+    <label>
+      <span>City Coverage</span>
+      <input type="text" name="city" value="{{ city }}">
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="primary-button">Apply Filters</button>
+      <a class="secondary-button" href="/dashboard/realtors">Reset</a>
+    </div>
+  </form>
+</section>
+
+<section class="section-panel">
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Specialty</th>
+          <th>Coverage</th>
+          <th>Contact</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for realtor in realtors %}
+        <tr>
+          <td><strong>{{ realtor.name }}</strong></td>
+          <td>{{ realtor.specialty }}</td>
+          <td>{{ realtor.cities_covered|join(', ') }}</td>
+          <td>{{ realtor.phone }}<br><span class="muted">{{ realtor.email }}</span></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" class="empty-state">No realtors match the current filter.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-row">
+    <span>Page {{ current_page }} of {{ total_pages }}</span>
+  </div>
+</section>
+{% endblock %}

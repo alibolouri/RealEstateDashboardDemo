@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard{% endblock %} | AI Real Estate Assistant</title>
+  <link rel="icon" href="{{ url_for('static', path='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body class="density-{{ app_settings.dashboard_density if app_settings else 'comfortable' }}">
+  <div class="layout-shell {% if active_page == 'login' %}layout-auth{% endif %}">
+    {% if active_page != 'login' %}
+    <aside class="sidebar">
+      <div class="brand-block">
+        <p class="eyebrow">Admin Console</p>
+        <h1>AI Real Estate Assistant</h1>
+        <p class="muted">Local demo dashboard</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="{% if active_page == 'overview' %}active{% endif %}">Overview</a>
+        <a href="/dashboard/properties" class="{% if active_page == 'properties' %}active{% endif %}">Properties</a>
+        <a href="/dashboard/leads" class="{% if active_page == 'leads' %}active{% endif %}">Leads</a>
+        <a href="/dashboard/realtors" class="{% if active_page == 'realtors' %}active{% endif %}">Realtors</a>
+        <a href="/dashboard/settings" class="{% if active_page == 'settings' %}active{% endif %}">Settings</a>
+        {% if app_settings.feature_integrations_panel %}
+        <a href="/dashboard/integrations" class="{% if active_page == 'integrations' %}active{% endif %}">Integrations</a>
+        {% endif %}
+      </nav>
+      <form method="post" action="/dashboard/logout" class="logout-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="secondary-button full-width">Log Out</button>
+      </form>
+    </aside>
+    {% endif %}
+
+    <main class="content-area">
+      {% if flash %}
+      <div class="flash flash-{{ flash.kind }}">
+        <strong>{{ flash.kind|capitalize }}</strong>
+        <span>{{ flash.message }}</span>
+      </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

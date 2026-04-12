@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Overview{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Operations Snapshot</p>
+    <h2>Dashboard Overview</h2>
+    <p class="muted">Monitor listings, lead flow, and connector readiness from one place.</p>
+  </div>
+  <div class="header-meta">
+    <span class="status-pill {% if app_settings.feature_lead_routing_writes %}good{% else %}muted{% endif %}">{{ "Lead routing enabled" if app_settings.feature_lead_routing_writes else "Lead routing paused" }}</span>
+  </div>
+</section>
+
+<section class="card-grid metrics-grid">
+  <article class="metric-card">
+    <p class="metric-label">Properties</p>
+    <p class="metric-value">{{ metrics.total_properties }}</p>
+    <p class="muted">All seeded listings</p>
+  </article>
+  <article class="metric-card">
+    <p class="metric-label">Active Listings</p>
+    <p class="metric-value">{{ metrics.active_properties }}</p>
+    <p class="muted">For sale and for rent</p>
+  </article>
+  <article class="metric-card">
+    <p class="metric-label">Leads</p>
+    <p class="metric-value">{{ metrics.total_leads }}</p>
+    <p class="muted">Stored routed leads</p>
+  </article>
+  <article class="metric-card">
+    <p class="metric-label">Realtors</p>
+    <p class="metric-value">{{ metrics.total_realtors }}</p>
+    <p class="muted">Available routing pool</p>
+  </article>
+  <article class="metric-card">
+    <p class="metric-label">Enabled Integrations</p>
+    <p class="metric-value">{{ metrics.enabled_integrations }}</p>
+    <p class="muted">Connectors currently turned on</p>
+  </article>
+</section>
+
+{% if integration_groups %}
+<section class="section-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Research Catalog</p>
+      <h3>Potential Integration Categories</h3>
+    </div>
+    <a class="text-link" href="/dashboard/integrations">Open full catalog</a>
+  </div>
+  <div class="card-grid">
+    {% for category, items in integration_groups %}
+    <article class="panel-card">
+      <h4>{{ category }}</h4>
+      <ul class="structured-list">
+        {% for item in items[:3] %}
+        <li>
+          <strong>{{ item.service_name }}</strong>
+          <span class="muted">{{ item.vendor_name }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

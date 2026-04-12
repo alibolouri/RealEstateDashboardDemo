@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Mia Carter",
+    "phone": "+1-555-201-1001",
+    "email": "mia.carter@example.com",
+    "specialty": "Houston residential listings",
+    "cities_covered": ["Houston", "Sugar Land"]
+  },
+  {
+    "id": 2,
+    "name": "Ethan Brooks",
+    "phone": "+1-555-201-1002",
+    "email": "ethan.brooks@example.com",
+    "specialty": "Austin condos and rentals",
+    "cities_covered": ["Austin", "Round Rock"]
+  },
+  {
+    "id": 3,
+    "name": "Sophia Nguyen",
+    "phone": "+1-555-201-1003",
+    "email": "sophia.nguyen@example.com",
+    "specialty": "Dallas family homes",
+    "cities_covered": ["Dallas", "Plano"]
+  },
+  {
+    "id": 4,
+    "name": "Daniel Ramirez",
+    "phone": "+1-555-201-1004",
+    "email": "daniel.ramirez@example.com",
+    "specialty": "San Antonio move-in-ready homes",
+    "cities_covered": ["San Antonio", "New Braunfels"]
+  }
+]

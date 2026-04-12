@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+  <div class="section-heading">
+    <p class="eyebrow">Protected Access</p>
+    <h2>Admin Login</h2>
+    <p class="muted">Use the local admin credentials from the environment settings.</p>
+  </div>
+
+  <form method="post" action="/dashboard/login" class="stack-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next_path" value="/dashboard">
+
+    <label>
+      <span>Username</span>
+      <input type="text" name="username" autocomplete="username" required>
+    </label>
+
+    <label>
+      <span>Password</span>
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+
+    <button type="submit" class="primary-button">Sign In</button>
+  </form>
+</section>
+{% endblock %}
