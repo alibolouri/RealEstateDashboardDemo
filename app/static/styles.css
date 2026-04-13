@@ -737,6 +737,7 @@ small.muted {
 .secondary-button,
 .ghost-button {
   background: #f7efe3;
+  background-color: #f7efe3;
   border-color: rgba(96, 81, 57, 0.14);
   color: var(--text);
 }
@@ -939,8 +940,10 @@ th {
   margin-top: 10px;
 }
 
-.logout-form .secondary-button {
+.logout-form .secondary-button,
+.sidebar .secondary-button.full-width {
   background: rgba(255, 247, 234, 0.92);
+  background-color: rgba(255, 247, 234, 0.92);
   border-color: rgba(255, 236, 212, 0.42);
   color: var(--primary-strong);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
