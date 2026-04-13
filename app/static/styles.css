@@ -547,6 +547,19 @@ textarea {
   color: #f8efe1;
 }
 
+.section-panel.dark-accent .panel-card {
+  background: linear-gradient(180deg, rgb(28 27 23 / 92%), rgba(247, 238, 225, 0.9));
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f8efe1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.section-panel.dark-accent .panel-card h4,
+.section-panel.dark-accent .panel-card strong,
+.section-panel.dark-accent .panel-card .muted {
+  color: #f8efe1;
+}
+
 .auth-shell {
   min-height: 100vh;
   display: grid;
