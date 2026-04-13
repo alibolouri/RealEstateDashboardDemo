@@ -939,6 +939,17 @@ th {
   margin-top: 10px;
 }
 
+.logout-form .secondary-button {
+  background: rgba(255, 247, 234, 0.92);
+  border-color: rgba(255, 236, 212, 0.42);
+  color: var(--primary-strong);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+}
+
+.logout-form .secondary-button:hover {
+  background: #fffaf3;
+}
+
 .density-compact .content-area {
   padding: 26px 28px 32px;
 }
