@@ -736,7 +736,7 @@ small.muted {
 
 .secondary-button,
 .ghost-button {
-  background: rgba(255, 255, 255, 0.48);
+  background: #f7efe3;
   border-color: rgba(96, 81, 57, 0.14);
   color: var(--text);
 }
