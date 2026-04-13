@@ -1,1 +1,1 @@
-"""Doorviser backend namespace."""
+"""Real-estate concierge backend namespace."""

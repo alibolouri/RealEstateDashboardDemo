@@ -4,7 +4,17 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { ConversationList } from "./ConversationList";
 import { DetailPanel } from "./DetailPanel";
-import { createConversation, fetchConversations, getHistory, sendMessageStream, type HandoffCard, type Message, type PropertyCard, type SourceCitation } from "../lib/api";
+import {
+  createConversation,
+  fetchConversations,
+  fetchHealth,
+  getHistory,
+  sendMessageStream,
+  type HandoffCard,
+  type ListingCard,
+  type Message,
+  type SourceCitation
+} from "../lib/api";
 
 type Conversation = {
   id: string;
@@ -24,12 +34,20 @@ export function Dashboard() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [panelProperties, setPanelProperties] = useState<PropertyCard[]>([]);
+  const [panelListings, setPanelListings] = useState<ListingCard[]>([]);
   const [panelHandoff, setPanelHandoff] = useState<HandoffCard | null>(null);
   const [panelSources, setPanelSources] = useState<SourceCitation[]>([]);
+  const [assistantBrand, setAssistantBrand] = useState("Real Estate Concierge");
+  const [brokerageName, setBrokerageName] = useState("Summit Realty Group");
+  const [sourceMode, setSourceMode] = useState("demo_json");
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    void fetchHealth().then((payload) => {
+      setAssistantBrand(payload.assistant_brand);
+      setBrokerageName(payload.brokerage_name);
+      setSourceMode(payload.listing_source_mode);
+    }).catch(() => undefined);
     void fetchConversations().then((rows) => {
       setConversations(rows);
       if (rows.length > 0) {
@@ -43,7 +61,7 @@ export function Dashboard() {
     void getHistory(activeConversationId).then((history) => {
       setMessages(history);
       const lastAssistant = [...history].reverse().find((row) => row.role === "assistant");
-      setPanelProperties(lastAssistant?.property_results || []);
+      setPanelListings(lastAssistant?.listing_results || []);
       setPanelHandoff(lastAssistant?.handoff || null);
       setPanelSources(lastAssistant?.sources || []);
     }).catch(() => setMessages([]));
@@ -63,7 +81,7 @@ export function Dashboard() {
     setConversations((current) => [conversation, ...current]);
     setActiveConversationId(conversationId);
     setMessages([]);
-    setPanelProperties([]);
+    setPanelListings([]);
     setPanelHandoff(null);
     setPanelSources([]);
   };
@@ -82,7 +100,14 @@ export function Dashboard() {
     }
 
     const userMessage: Message = { role: "user", content, created_at: new Date().toISOString() };
-    const assistantPlaceholder: Message = { role: "assistant", content: "", created_at: new Date().toISOString(), property_results: [], sources: [], handoff: null };
+    const assistantPlaceholder: Message = {
+      role: "assistant",
+      content: "",
+      created_at: new Date().toISOString(),
+      listing_results: [],
+      sources: [],
+      handoff: null
+    };
     setMessages((current) => [...current, userMessage, assistantPlaceholder]);
     setIsLoading(true);
 
@@ -100,7 +125,7 @@ export function Dashboard() {
         });
       },
       (meta) => {
-        setPanelProperties(meta.property_results || []);
+        setPanelListings(meta.listing_results || []);
         setPanelHandoff(meta.handoff || null);
         setPanelSources(meta.sources || []);
         setMessages((current) => {
@@ -145,13 +170,19 @@ export function Dashboard() {
         activeConversationId={activeConversationId}
         onSelectConversation={setActiveConversationId}
         onNewConversation={handleNewConversation}
+        assistantBrand={assistantBrand}
+        brokerageName={brokerageName}
       />
 
       <main className="chat-shell">
         <header className="hero">
           <span className="eyebrow">Standalone trial console</span>
-          <h1>Doorviser AI Concierge</h1>
-          <p>Ask about listings, neighborhoods, buying, renting, short stays, or request a human handoff.</p>
+          <h1>{assistantBrand}</h1>
+          <p>Ask about listings, neighborhoods, buying, renting, short stays, or request a brokerage handoff.</p>
+          <div className="hero-meta">
+            <span>{brokerageName}</span>
+            <span>Listing source mode: {sourceMode}</span>
+          </div>
         </header>
 
         <section className="chat-thread">
@@ -167,17 +198,23 @@ export function Dashboard() {
               </div>
             </div>
           ) : (
-            messages.map((message, index) => <ChatMessage key={`${message.created_at}-${index}`} message={message} />)
+            messages.map((message, index) => (
+              <ChatMessage key={`${message.created_at}-${index}`} message={message} assistantLabel={assistantBrand} />
+            ))
           )}
-          {isLoading && <div className="thinking-indicator">Doorviser AI is thinking…</div>}
+          {isLoading && <div className="thinking-indicator">{assistantBrand} is thinking...</div>}
           <div ref={endRef} />
         </section>
 
         <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} />
       </main>
 
-      <DetailPanel properties={panelProperties} handoff={panelHandoff} sources={panelSources} />
+      <DetailPanel
+        listings={panelListings}
+        handoff={panelHandoff}
+        sources={panelSources}
+        brokerageName={brokerageName}
+      />
     </div>
   );
 }
-

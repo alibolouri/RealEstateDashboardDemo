@@ -1,8 +1,13 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || window.location.origin || "http://localhost:8000";
 
+export type DataStatus = "live" | "cached" | "demo";
+
 export type SourceCitation = {
-  type: "property_data" | "market_knowledge" | "routing_policy";
+  type: "listing_source" | "knowledge_source" | "routing_source";
   label: string;
+  timestamp?: string | null;
+  confidence: number;
+  data_status: DataStatus;
 };
 
 export type RealtorCard = {
@@ -15,18 +20,29 @@ export type RealtorCard = {
   brokerage: string;
 };
 
-export type PropertyCard = {
+export type ListingCard = {
   id: string;
+  source: string;
+  external_id: string;
   title: string;
+  address: string;
   city: string;
   state: string;
+  zip_code: string;
   price: number;
   listing_type: string;
   property_type: string;
+  status: string;
   bedrooms: number;
   bathrooms: number;
+  square_feet?: number | null;
   short_description: string;
   image_url?: string | null;
+  brokerage?: string | null;
+  url?: string | null;
+  last_synced_at?: string | null;
+  provenance: string;
+  data_status: DataStatus;
 };
 
 export type HandoffCard = {
@@ -41,8 +57,9 @@ export type Message = {
   content: string;
   created_at: string;
   sources?: SourceCitation[];
-  property_results?: PropertyCard[];
+  listing_results?: ListingCard[];
   handoff?: HandoffCard | null;
+  data_status?: DataStatus | null;
 };
 
 export async function createConversation(): Promise<string> {
@@ -65,11 +82,17 @@ export async function getHistory(conversationId: string): Promise<Message[]> {
   return payload.messages;
 }
 
+export async function fetchHealth(): Promise<{ assistant_brand: string; brokerage_name: string; listing_source_mode: string }> {
+  const response = await fetch(`${API_BASE_URL}/health`);
+  if (!response.ok) throw new Error("Failed to fetch health metadata");
+  return response.json();
+}
+
 export async function sendMessageStream(
   conversationId: string,
   message: string,
   onChunk: (chunk: string) => void,
-  onMeta: (meta: { sources?: SourceCitation[]; property_results?: PropertyCard[]; handoff?: HandoffCard | null }) => void,
+  onMeta: (meta: { sources?: SourceCitation[]; listing_results?: ListingCard[]; handoff?: HandoffCard | null; data_status?: DataStatus | null }) => void,
   onComplete: () => void,
   onError: (error: string) => void
 ): Promise<void> {

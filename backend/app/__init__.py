@@ -1,4 +1,4 @@
-"""Doorviser real-estate agent backend package."""
+"""White-label real-estate concierge backend package."""
 
 from dotenv import load_dotenv
 

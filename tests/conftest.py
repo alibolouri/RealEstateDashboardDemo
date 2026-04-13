@@ -18,7 +18,10 @@ def client(monkeypatch):
     runtime_dir.mkdir(exist_ok=True)
     db_path = runtime_dir / f"{uuid.uuid4().hex}.db"
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_path.as_posix()}")
-    monkeypatch.setenv("DOORVISER_CONTACT_NUMBER", "+1-800-TEST")
+    monkeypatch.setenv("BROKERAGE_CONTACT_NUMBER", "+1-800-TEST")
+    monkeypatch.setenv("BROKERAGE_NAME", "Test Brokerage")
+    monkeypatch.setenv("ASSISTANT_BRAND_NAME", "Test Concierge")
+    monkeypatch.setenv("LISTING_SOURCE_MODE", "demo_json")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     for module_name in list(sys.modules):

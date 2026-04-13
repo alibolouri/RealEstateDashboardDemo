@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.agent import create_handoff, run_agent, stream_agent
+from backend.app.connectors import assistant_brand, brokerage_name, listing_source_mode
 from backend.app.database import conversation_exists, create_conversation, get_conversation_history, init_db, list_conversations
 from backend.app.models import ConversationHistoryResponse, ConversationResponse, HealthResponse, HandoffRequest, HandoffResponse, MessageHistory, MessageRequest, MessageResponse
 
@@ -24,8 +25,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Doorviser Real-Estate Agent API",
-    description="Streaming conversational assistant for property discovery and Doorviser handoff",
+    title="White-Label Real-Estate Concierge API",
+    description="Streaming conversational assistant for listing discovery, guidance, and brokerage handoff",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -52,7 +53,13 @@ async def serve_frontend_root():
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
-    return HealthResponse(status="healthy", timestamp=datetime.now(UTC))
+    return HealthResponse(
+        status="healthy",
+        timestamp=datetime.now(UTC),
+        listing_source_mode=listing_source_mode(),
+        assistant_brand=assistant_brand(),
+        brokerage_name=brokerage_name(),
+    )
 
 
 @app.get("/conversations")
@@ -74,8 +81,9 @@ async def send_message(conversation_id: str, request: MessageRequest) -> Message
         response=envelope.response,
         conversation_id=conversation_id,
         sources=envelope.sources,
-        property_results=envelope.property_results,
+        listing_results=envelope.listing_results,
         handoff=envelope.handoff,
+        data_status=envelope.data_status,
     )
 
 
@@ -86,8 +94,8 @@ async def send_message_stream(conversation_id: str, request: MessageRequest):
 
     async def event_generator():
         async for payload in stream_agent(conversation_id, request.message):
-            yield f"data: {json.dumps(payload)}\n\n"
-        yield f"data: {json.dumps({'done': True})}\n\n"
+            yield f"data: {json.dumps(payload, default=str)}\n\n"
+        yield f"data: {json.dumps({'done': True}, default=str)}\n\n"
 
     return StreamingResponse(
         event_generator(),
@@ -107,8 +115,9 @@ async def get_history(conversation_id: str, limit: int = 100) -> ConversationHis
             content=row["content"],
             created_at=row["created_at"],
             sources=row["meta"].get("sources", []),
-            property_results=row["meta"].get("property_results", []),
+            listing_results=row["meta"].get("listing_results", []),
             handoff=row["meta"].get("handoff"),
+            data_status=row["meta"].get("data_status"),
         )
         for row in rows
     ]
@@ -122,6 +131,6 @@ async def request_handoff(request: HandoffRequest) -> HandoffResponse:
             conversation_id=request.conversation_id,
             message=request.message,
             city=request.city,
-            property_id=request.property_id,
+            listing_id=request.listing_id,
         )
     )

@@ -9,15 +9,24 @@ type Props = {
   activeConversationId: string | null;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
+  assistantBrand: string;
+  brokerageName: string;
 };
 
-export function ConversationList({ conversations, activeConversationId, onSelectConversation, onNewConversation }: Props) {
+export function ConversationList({
+  conversations,
+  activeConversationId,
+  onSelectConversation,
+  onNewConversation,
+  assistantBrand,
+  brokerageName
+}: Props) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <span className="eyebrow">Doorviser</span>
-        <h1>Real-Estate AI</h1>
-        <p>Conversational property search and handoff.</p>
+        <span className="eyebrow">White-label concierge</span>
+        <h1>{assistantBrand}</h1>
+        <p>{brokerageName} conversation workspace for listing search and routed human support.</p>
       </div>
       <button className="primary-button" onClick={onNewConversation}>
         New conversation
@@ -37,4 +46,3 @@ export function ConversationList({ conversations, activeConversationId, onSelect
     </aside>
   );
 }
-

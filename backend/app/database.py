@@ -9,7 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship,
 
 
 def _default_database_url() -> str:
-    return os.getenv("DATABASE_URL", "sqlite:///./doorviser_agent.db")
+    return os.getenv("DATABASE_URL", "sqlite:///./real_estate_concierge.db")
 
 
 def _engine_kwargs(database_url: str) -> dict:
@@ -58,7 +58,7 @@ class Handoff(Base):
     conversation_id: Mapped[str | None] = mapped_column(ForeignKey("conversations.id"), nullable=True)
     user_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     city: Mapped[str | None] = mapped_column(String(120), nullable=True)
-    property_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    listing_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
     fixed_contact_number: Mapped[str] = mapped_column(String(50), nullable=False)
     recommended_realtor_id: Mapped[str] = mapped_column(String(120), nullable=False)
     reason: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -98,7 +98,7 @@ def save_message(conversation_id: str, role: str, content: str, meta: dict | Non
                 conversation_id=conversation_id,
                 role=role,
                 content=content,
-                meta_json=json.dumps(meta) if meta else None,
+                meta_json=json.dumps(meta, default=str) if meta else None,
             )
         )
         db.commit()
@@ -143,7 +143,7 @@ def save_handoff(
     conversation_id: str | None,
     user_message: str | None,
     city: str | None,
-    property_id: str | None,
+    listing_id: str | None,
     fixed_contact_number: str,
     recommended_realtor_id: str,
     reason: str,
@@ -153,7 +153,7 @@ def save_handoff(
             conversation_id=conversation_id,
             user_message=user_message,
             city=city,
-            property_id=property_id,
+            listing_id=listing_id,
             fixed_contact_number=fixed_contact_number,
             recommended_realtor_id=recommended_realtor_id,
             reason=reason,

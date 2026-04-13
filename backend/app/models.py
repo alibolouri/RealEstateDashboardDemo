@@ -4,9 +4,16 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 
+DataStatus = Literal["live", "cached", "demo"]
+SourceType = Literal["listing_source", "knowledge_source", "routing_source"]
+
+
 class SourceCitation(BaseModel):
-    type: Literal["property_data", "market_knowledge", "routing_policy"]
+    type: SourceType
     label: str
+    timestamp: datetime | None = None
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    data_status: DataStatus = "demo"
 
 
 class RealtorCard(BaseModel):
@@ -19,18 +26,29 @@ class RealtorCard(BaseModel):
     brokerage: str
 
 
-class PropertyCard(BaseModel):
+class ListingCard(BaseModel):
     id: str
+    source: str
+    external_id: str
     title: str
+    address: str
     city: str
     state: str
+    zip_code: str
     price: int
     listing_type: str
     property_type: str
+    status: str
     bedrooms: float
     bathrooms: float
+    square_feet: int | None = None
     short_description: str
     image_url: str | None = None
+    brokerage: str | None = None
+    url: str | None = None
+    last_synced_at: datetime | None = None
+    provenance: str
+    data_status: DataStatus = "demo"
 
 
 class HandoffCard(BaseModel):
@@ -48,8 +66,9 @@ class MessageResponse(BaseModel):
     response: str
     conversation_id: str
     sources: list[SourceCitation] = Field(default_factory=list)
-    property_results: list[PropertyCard] = Field(default_factory=list)
+    listing_results: list[ListingCard] = Field(default_factory=list)
     handoff: HandoffCard | None = None
+    data_status: DataStatus | None = None
 
 
 class ConversationResponse(BaseModel):
@@ -61,8 +80,9 @@ class MessageHistory(BaseModel):
     content: str
     created_at: datetime
     sources: list[SourceCitation] = Field(default_factory=list)
-    property_results: list[PropertyCard] = Field(default_factory=list)
+    listing_results: list[ListingCard] = Field(default_factory=list)
     handoff: HandoffCard | None = None
+    data_status: DataStatus | None = None
 
 
 class ConversationHistoryResponse(BaseModel):
@@ -73,13 +93,16 @@ class ConversationHistoryResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     timestamp: datetime
+    listing_source_mode: str
+    assistant_brand: str
+    brokerage_name: str
 
 
 class HandoffRequest(BaseModel):
     conversation_id: str | None = None
     message: str | None = None
     city: str | None = None
-    property_id: str | None = None
+    listing_id: str | None = None
 
 
 class HandoffResponse(BaseModel):
@@ -100,7 +123,7 @@ class AgentAnalysis(BaseModel):
     property_type: str | None = None
     listing_type: str | None = None
     status: str | None = None
-    property_id: str | None = None
+    listing_id: str | None = None
     needs_handoff: bool = False
     topic: str | None = None
 
@@ -108,14 +131,15 @@ class AgentAnalysis(BaseModel):
 class AgentEnvelope(BaseModel):
     response: str
     sources: list[SourceCitation] = Field(default_factory=list)
-    property_results: list[PropertyCard] = Field(default_factory=list)
+    listing_results: list[ListingCard] = Field(default_factory=list)
     handoff: HandoffCard | None = None
+    data_status: DataStatus | None = None
     analysis: AgentAnalysis
 
 
 class AgentContext(BaseModel):
     analysis: AgentAnalysis
-    properties: list[dict[str, Any]] = Field(default_factory=list)
-    property_detail: dict[str, Any] | None = None
-    knowledge_hits: list[dict[str, Any]] = Field(default_factory=list)
+    listings: list[dict[str, Any]] = Field(default_factory=list)
+    listing_detail: dict[str, Any] | None = None
+    guidance_hits: list[dict[str, Any]] = Field(default_factory=list)
     handoff: dict[str, Any] | None = None

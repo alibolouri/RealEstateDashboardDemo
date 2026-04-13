@@ -1,30 +1,36 @@
-import type { HandoffCard, PropertyCard, SourceCitation } from "../lib/api";
+import type { HandoffCard, ListingCard, SourceCitation } from "../lib/api";
 
 type Props = {
-  properties: PropertyCard[];
+  listings: ListingCard[];
   handoff: HandoffCard | null;
   sources: SourceCitation[];
+  brokerageName: string;
 };
 
-export function DetailPanel({ properties, handoff, sources }: Props) {
+function formatPrice(listing: ListingCard) {
+  return listing.listing_type === "short_stay" ? `$${listing.price}/night` : `$${listing.price.toLocaleString()}`;
+}
+
+export function DetailPanel({ listings, handoff, sources, brokerageName }: Props) {
   return (
     <aside className="detail-panel">
       <section className="panel-block">
         <span className="eyebrow">Context</span>
-        <h2>Active results</h2>
-        {properties.length === 0 ? (
-          <p className="muted">Relevant properties will appear here once the assistant finds matches.</p>
+        <h2>Matched listings</h2>
+        {listings.length === 0 ? (
+          <p className="muted">Relevant listings will appear here once the assistant finds matches.</p>
         ) : (
-          properties.map((property) => (
-            <article className="property-card" key={property.id}>
+          listings.map((listing) => (
+            <article className="property-card" key={listing.id}>
               <div>
-                <strong>{property.title}</strong>
-                <span>{property.city}, {property.state}</span>
+                <strong>{listing.title}</strong>
+                <span>{listing.city}, {listing.state}</span>
               </div>
               <p>
-                {property.listing_type === "short_stay" ? `$${property.price}/night` : `$${property.price.toLocaleString()}`} · {property.bedrooms} bd · {property.bathrooms} ba
+                {formatPrice(listing)} · {listing.bedrooms} bd · {listing.bathrooms} ba
               </p>
-              <small>{property.short_description}</small>
+              <small>{listing.short_description}</small>
+              <small className="meta-line">{listing.source} · {listing.data_status}</small>
             </article>
           ))
         )}
@@ -32,10 +38,10 @@ export function DetailPanel({ properties, handoff, sources }: Props) {
 
       <section className="panel-block">
         <span className="eyebrow">Handoff</span>
-        <h2>Doorviser routing</h2>
+        <h2>{brokerageName} routing</h2>
         {handoff ? (
           <article className="handoff-card">
-            <p><strong>Doorviser:</strong> {handoff.fixed_contact_number}</p>
+            <p><strong>Brokerage:</strong> {handoff.fixed_contact_number}</p>
             <p><strong>Realtor:</strong> {handoff.recommended_realtor.name}</p>
             <p>{handoff.recommended_realtor.specialty}</p>
             <small>{handoff.reason}</small>
@@ -47,13 +53,16 @@ export function DetailPanel({ properties, handoff, sources }: Props) {
 
       <section className="panel-block">
         <span className="eyebrow">Sources</span>
-        <h2>Grounding</h2>
+        <h2>Grounding and provenance</h2>
         {sources.length === 0 ? (
-          <p className="muted">Sources will appear once the assistant references property data or Doorviser knowledge.</p>
+          <p className="muted">Sources will appear once the assistant references listings, guidance documents, or routing policy.</p>
         ) : (
           <ul className="source-list">
             {sources.map((source, index) => (
-              <li key={`${source.label}-${index}`}>{source.label}</li>
+              <li key={`${source.label}-${index}`}>
+                <strong>{source.label}</strong>
+                <span>{source.type.replace("_", " ")} · {source.data_status} · {Math.round(source.confidence * 100)}% confidence</span>
+              </li>
             ))}
           </ul>
         )}
@@ -61,4 +70,3 @@ export function DetailPanel({ properties, handoff, sources }: Props) {
     </aside>
   );
 }
-

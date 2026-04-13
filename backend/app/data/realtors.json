@@ -1,10 +1,10 @@
 [
-  {"id":"realtor-001","name":"Maya Patel","phone":"+1-713-555-1101","email":"maya@doorviser-demo.com","specialty":"Houston residential sales and leases","cities_covered":["Houston"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-002","name":"Jordan Lee","phone":"+1-713-555-1102","email":"jordan@doorviser-demo.com","specialty":"Luxury and condo advisory","cities_covered":["Houston"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-003","name":"Elena Brooks","phone":"+1-512-555-2201","email":"elena@doorviser-demo.com","specialty":"Austin condos, relocation, and short stays","cities_covered":["Austin"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-004","name":"Nathan Cole","phone":"+1-512-555-2202","email":"nathan@doorviser-demo.com","specialty":"Austin family homes and investment property","cities_covered":["Austin"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-005","name":"Sophia Ramirez","phone":"+1-214-555-3301","email":"sophia@doorviser-demo.com","specialty":"Dallas urban leases and first-time buyers","cities_covered":["Dallas"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-006","name":"Marcus Hill","phone":"+1-214-555-3302","email":"marcus@doorviser-demo.com","specialty":"Dallas luxury condos and relocation","cities_covered":["Dallas"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-007","name":"Ariana Gomez","phone":"+1-210-555-4401","email":"ariana@doorviser-demo.com","specialty":"San Antonio family homes and short stays","cities_covered":["San Antonio"],"brokerage":"Doorviser Partner Network"},
-  {"id":"realtor-008","name":"Camila Torres","phone":"+1-305-555-5501","email":"camila@doorviser-demo.com","specialty":"Miami condos, waterfront, and travel stays","cities_covered":["Miami","Miami Beach"],"brokerage":"Doorviser Partner Network"}
+  {"id":"realtor-001","name":"Maya Patel","phone":"+1-713-555-1101","email":"maya@summit-realty-demo.com","specialty":"Houston residential sales and leases","cities_covered":["Houston"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-002","name":"Jordan Lee","phone":"+1-713-555-1102","email":"jordan@summit-realty-demo.com","specialty":"Luxury and condo advisory","cities_covered":["Houston"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-003","name":"Elena Brooks","phone":"+1-512-555-2201","email":"elena@summit-realty-demo.com","specialty":"Austin condos, relocation, and short stays","cities_covered":["Austin"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-004","name":"Nathan Cole","phone":"+1-512-555-2202","email":"nathan@summit-realty-demo.com","specialty":"Austin family homes and investment property","cities_covered":["Austin"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-005","name":"Sophia Ramirez","phone":"+1-214-555-3301","email":"sophia@summit-realty-demo.com","specialty":"Dallas urban leases and first-time buyers","cities_covered":["Dallas"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-006","name":"Marcus Hill","phone":"+1-214-555-3302","email":"marcus@summit-realty-demo.com","specialty":"Dallas luxury condos and relocation","cities_covered":["Dallas"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-007","name":"Ariana Gomez","phone":"+1-210-555-4401","email":"ariana@summit-realty-demo.com","specialty":"San Antonio family homes and short stays","cities_covered":["San Antonio"],"brokerage":"Summit Realty Group"},
+  {"id":"realtor-008","name":"Camila Torres","phone":"+1-305-555-5501","email":"camila@summit-realty-demo.com","specialty":"Miami condos, waterfront, and travel stays","cities_covered":["Miami","Miami Beach"],"brokerage":"Summit Realty Group"}
 ]
