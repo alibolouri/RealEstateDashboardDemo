@@ -1,14 +1,20 @@
 import json
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from backend.app.agent import create_handoff, run_agent, stream_agent
 from backend.app.database import conversation_exists, create_conversation, get_conversation_history, init_db, list_conversations
 from backend.app.models import ConversationHistoryResponse, ConversationResponse, HealthResponse, HandoffRequest, HandoffResponse, MessageHistory, MessageRequest, MessageResponse
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
 
 
 @asynccontextmanager
@@ -31,6 +37,17 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+
+if (FRONTEND_DIST / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="frontend-assets")
+
+
+@app.get("/", include_in_schema=False)
+async def serve_frontend_root():
+    index_file = FRONTEND_DIST / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return RedirectResponse(url="/docs", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
 
 @app.get("/health", response_model=HealthResponse)
