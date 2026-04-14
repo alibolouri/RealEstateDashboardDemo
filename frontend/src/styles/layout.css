@@ -1,9 +1,14 @@
 .app-shell {
   display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  grid-template-columns: 320px minmax(0, 1fr);
   height: 100dvh;
   background: transparent;
   overflow: hidden;
+  transition: grid-template-columns var(--duration-standard) var(--ease-standard);
+}
+
+.app-shell--sidebar-collapsed {
+  grid-template-columns: 92px minmax(0, 1fr);
 }
 
 .shell-sidebar {
@@ -11,6 +16,7 @@
   border-right: 1px solid var(--border-subtle);
   background: var(--bg-sidebar);
   min-width: 0;
+  overflow: hidden;
   transition: width var(--duration-standard) var(--ease-standard), opacity var(--duration-fast) var(--ease-standard);
 }
 
