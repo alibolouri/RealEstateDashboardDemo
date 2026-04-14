@@ -1,20 +1,22 @@
 type Props = {
   assistantBrand: string;
   brokerageName: string;
-  sourceMode: string;
+  sourceModeLabel: string;
   onToggleSidebar: () => void;
   onOpenDrawer: () => void;
   onOpenSheet: () => void;
+  onLogout: () => void;
   mobile: boolean;
 };
 
 export function TopBar({
   assistantBrand,
   brokerageName,
-  sourceMode,
+  sourceModeLabel,
   onToggleSidebar,
   onOpenDrawer,
   onOpenSheet,
+  onLogout,
   mobile
 }: Props) {
   return (
@@ -38,10 +40,15 @@ export function TopBar({
 
       <div className="top-bar__right">
         <span className="status-pill status-pill--healthy">healthy</span>
-        <span className="status-pill status-pill--demo">{sourceMode}</span>
+        {!mobile ? <span className="status-pill status-pill--demo">{sourceModeLabel}</span> : null}
         <button className="button button--ghost mobile-only" onClick={onOpenSheet}>
           Context
         </button>
+        {!mobile ? (
+          <button className="button button--secondary top-bar__logout" onClick={onLogout}>
+            Log out
+          </button>
+        ) : null}
       </div>
     </header>
   );

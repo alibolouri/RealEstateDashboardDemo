@@ -44,6 +44,19 @@ function useMobileLayout() {
   return isMobile;
 }
 
+function formatSourceMode(sourceMode: string) {
+  switch (sourceMode) {
+    case "demo_json":
+      return "Sample listings";
+    case "live":
+      return "Live feed";
+    case "cached":
+      return "Cached feed";
+    default:
+      return sourceMode.replace(/[_-]/g, " ");
+  }
+}
+
 export function Dashboard() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -61,6 +74,7 @@ export function Dashboard() {
   const [mobileView, setMobileView] = useState<MobileView>("workspace");
   const endRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useMobileLayout();
+  const sourceModeLabel = useMemo(() => formatSourceMode(sourceMode), [sourceMode]);
 
   useEffect(() => {
     void fetchHealth()
@@ -127,6 +141,17 @@ export function Dashboard() {
     setActiveConversationId(conversationId);
     setMobileView("workspace");
     setMobileDrawerOpen(false);
+  };
+
+  const handleLogout = () => {
+    setActiveConversationId(null);
+    setMessages([]);
+    setPanelListings([]);
+    setPanelHandoff(null);
+    setPanelSources([]);
+    setMobileDrawerOpen(false);
+    setMobileSheetOpen(false);
+    setMobileView("workspace");
   };
 
   const handleSendMessage = async (content: string) => {
@@ -220,6 +245,7 @@ export function Dashboard() {
             activeConversationId={activeConversationId}
             onSelectConversation={handleSelectConversation}
             onNewConversation={() => void handleNewConversation()}
+            onLogout={handleLogout}
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
           />
@@ -244,7 +270,7 @@ export function Dashboard() {
               </div>
               <div className="workspace-meta">
                 <span className="status-pill status-pill--healthy">healthy</span>
-                <span className="status-pill status-pill--demo">{sourceMode}</span>
+                <span className="status-pill status-pill--demo">{sourceModeLabel}</span>
               </div>
             </div>
 
@@ -270,6 +296,7 @@ export function Dashboard() {
             activeConversationId={activeConversationId}
             onSelectConversation={handleSelectConversation}
             onNewConversation={() => void handleNewConversation()}
+            onLogout={handleLogout}
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
             collapsed={sidebarCollapsed}
@@ -280,10 +307,11 @@ export function Dashboard() {
           <TopBar
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
-            sourceMode={sourceMode}
+            sourceModeLabel={sourceModeLabel}
             onToggleSidebar={() => setSidebarCollapsed((current) => !current)}
             onOpenDrawer={() => setMobileDrawerOpen(true)}
             onOpenSheet={() => setMobileSheetOpen(true)}
+            onLogout={handleLogout}
             mobile={isMobile}
           />
 
@@ -304,7 +332,7 @@ export function Dashboard() {
                       </div>
                       <div className="workspace-meta">
                         <span className="status-pill status-pill--healthy">healthy</span>
-                        <span className="status-pill status-pill--demo">{sourceMode}</span>
+                        <span className="status-pill status-pill--demo">{sourceModeLabel}</span>
                       </div>
                     </div>
 
@@ -321,7 +349,7 @@ export function Dashboard() {
               </div>
             </div>
 
-            <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} sourceMode={sourceMode} />
+            <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} sourceModeLabel={sourceModeLabel} />
           </section>
         </main>
 
@@ -341,6 +369,7 @@ export function Dashboard() {
               activeConversationId={activeConversationId}
               onSelectConversation={handleSelectConversation}
               onNewConversation={() => void handleNewConversation()}
+              onLogout={handleLogout}
               assistantBrand={assistantBrand}
               brokerageName={brokerageName}
             />

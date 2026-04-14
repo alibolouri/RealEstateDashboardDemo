@@ -3,10 +3,10 @@ import { FormEvent, KeyboardEvent, useMemo, useState } from "react";
 type Props = {
   onSend: (text: string) => void;
   disabled: boolean;
-  sourceMode: string;
+  sourceModeLabel: string;
 };
 
-export function ChatInput({ onSend, disabled, sourceMode }: Props) {
+export function ChatInput({ onSend, disabled, sourceModeLabel }: Props) {
   const [value, setValue] = useState("");
 
   const trimmed = value.trim();
@@ -48,7 +48,7 @@ export function ChatInput({ onSend, disabled, sourceMode }: Props) {
 
         <div className="composer__actions">
           <div className="composer__meta">
-            <span className="micro-pill">{sourceMode}</span>
+            <span className="micro-pill">{sourceModeLabel}</span>
             <span className="composer__status">{statusText}</span>
             {disabled ? (
               <span className="streaming-indicator">

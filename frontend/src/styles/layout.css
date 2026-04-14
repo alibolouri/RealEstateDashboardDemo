@@ -84,10 +84,11 @@
   min-height: 0;
   overflow: auto;
   padding: var(--space-6);
+  padding-bottom: 196px;
 }
 
 .workspace-inner {
-  width: min(100%, 960px);
+  width: min(100%, 1040px);
   margin: 0 auto;
 }
 
@@ -129,15 +130,37 @@
   }
 
   .top-bar {
-    padding-inline: var(--space-4);
+    height: auto;
+    min-height: 56px;
+    padding: var(--space-3) var(--space-4);
+    align-items: flex-start;
   }
 
   .workspace-scroll {
     padding: var(--space-4);
-    padding-bottom: 132px;
+    padding-bottom: 224px;
   }
 
   .mobile-surface {
     display: block;
+  }
+
+  .top-bar__left,
+  .top-bar__right {
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .top-bar__title {
+    font-size: 16px;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+  }
+
+  .top-bar__subtitle {
+    display: none;
   }
 }

@@ -9,6 +9,7 @@ type Props = {
   activeConversationId: string | null;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
+  onLogout: () => void;
   assistantBrand: string;
   brokerageName: string;
   collapsed?: boolean;
@@ -19,6 +20,7 @@ export function ConversationList({
   activeConversationId,
   onSelectConversation,
   onNewConversation,
+  onLogout,
   assistantBrand,
   brokerageName,
   collapsed = false
@@ -55,6 +57,13 @@ export function ConversationList({
           ))}
         </div>
       </section>
+
+      <div className="sidebar__footer">
+        <button className="button button--secondary sidebar__logout" onClick={onLogout}>
+          <span className="button__label">Log out</span>
+          {collapsed ? ">" : null}
+        </button>
+      </div>
     </aside>
   );
 }

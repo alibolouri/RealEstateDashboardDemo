@@ -154,6 +154,7 @@
   display: grid;
   gap: var(--space-2);
   min-height: 0;
+  flex: 1 1 auto;
 }
 
 .sidebar__section-title {
@@ -170,6 +171,18 @@
   gap: var(--space-2);
   overflow: auto;
   min-height: 0;
+}
+
+.sidebar__footer {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sidebar__logout {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
 }
 
 .conversation-row {
@@ -319,17 +332,20 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
+  padding-bottom: var(--space-2);
 }
 
 .thread {
   display: grid;
   gap: var(--space-4);
+  justify-items: center;
 }
 
 .run-block {
   padding: var(--space-5);
   display: grid;
   gap: var(--space-4);
+  width: 100%;
 }
 
 .run-block__header {
@@ -651,6 +667,10 @@
   backdrop-filter: blur(18px);
 }
 
+.top-bar__logout {
+  min-width: 84px;
+}
+
 .mobile-nav__item {
   display: inline-flex;
   flex-direction: column;
@@ -735,6 +755,12 @@
     min-height: 44px;
   }
 
+  .status-pill {
+    max-width: 92px;
+    padding-inline: var(--space-2);
+    font-size: 11px;
+  }
+
   .workspace-header {
     margin-bottom: var(--space-4);
   }
@@ -752,7 +778,59 @@
     padding: var(--space-3) var(--space-4) calc(64px + var(--space-3));
   }
 
+  .composer__shell {
+    width: 100%;
+    border-radius: var(--radius-lg);
+  }
+
+  .composer__actions {
+    align-items: flex-end;
+  }
+
+  .composer__meta {
+    gap: var(--space-1);
+    max-width: calc(100% - 110px);
+  }
+
   .context-panel {
     padding: 0;
+  }
+
+  .workspace-header__title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .workspace-header__body {
+    font-size: var(--dense-size);
+    line-height: var(--dense-line);
+  }
+
+  .starter-panel {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .starter-panel__body {
+    font-size: var(--dense-size);
+    line-height: var(--dense-line);
+  }
+
+  .shell-main {
+    width: 100%;
+  }
+
+  .top-bar__right {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .top-bar__logout {
+    min-width: 72px;
+    padding-inline: var(--space-3);
+  }
+
+  .sidebar {
+    padding-bottom: calc(var(--space-6) + 64px);
   }
 }
