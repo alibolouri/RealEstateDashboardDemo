@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ChatInput } from "./ChatInput";
 import { ConversationList } from "./ConversationList";
-import { DetailPanel } from "./DetailPanel";
 import { EmptyState } from "./EmptyState";
 import { ThreadView } from "./ThreadView";
 import { TopBar } from "./TopBar";
@@ -12,10 +11,7 @@ import {
   fetchHealth,
   getHistory,
   sendMessageStream,
-  type HandoffCard,
-  type ListingCard,
   type Message,
-  type SourceCitation
 } from "../lib/api";
 
 type Conversation = {
@@ -48,14 +44,10 @@ export function Dashboard() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [panelListings, setPanelListings] = useState<ListingCard[]>([]);
-  const [panelHandoff, setPanelHandoff] = useState<HandoffCard | null>(null);
-  const [panelSources, setPanelSources] = useState<SourceCitation[]>([]);
   const [assistantBrand, setAssistantBrand] = useState("Real Estate Concierge");
   const [brokerageName, setBrokerageName] = useState("Summit Realty Group");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useMobileLayout();
 
@@ -80,13 +72,7 @@ export function Dashboard() {
   useEffect(() => {
     if (!activeConversationId) return;
     void getHistory(activeConversationId)
-      .then((history) => {
-        setMessages(history);
-        const lastAssistant = [...history].reverse().find((row) => row.role === "assistant");
-        setPanelListings(lastAssistant?.listing_results || []);
-        setPanelHandoff(lastAssistant?.handoff || null);
-        setPanelSources(lastAssistant?.sources || []);
-      })
+      .then((history) => setMessages(history))
       .catch(() => setMessages([]));
   }, [activeConversationId]);
 
@@ -97,7 +83,6 @@ export function Dashboard() {
   useEffect(() => {
     if (!isMobile) {
       setMobileDrawerOpen(false);
-      setMobileSheetOpen(false);
     }
   }, [isMobile]);
 
@@ -111,9 +96,6 @@ export function Dashboard() {
     setConversations((current) => [conversation, ...current]);
     setActiveConversationId(conversationId);
     setMessages([]);
-    setPanelListings([]);
-    setPanelHandoff(null);
-    setPanelSources([]);
     setMobileDrawerOpen(false);
   };
 
@@ -125,11 +107,7 @@ export function Dashboard() {
   const handleLogout = () => {
     setActiveConversationId(null);
     setMessages([]);
-    setPanelListings([]);
-    setPanelHandoff(null);
-    setPanelSources([]);
     setMobileDrawerOpen(false);
-    setMobileSheetOpen(false);
   };
 
   const handleSendMessage = async (content: string) => {
@@ -171,9 +149,6 @@ export function Dashboard() {
         });
       },
       (meta) => {
-        setPanelListings(meta.listing_results || []);
-        setPanelHandoff(meta.handoff || null);
-        setPanelSources(meta.sources || []);
         setMessages((current) => {
           const next = [...current];
           const last = next[next.length - 1];
@@ -260,8 +235,6 @@ export function Dashboard() {
             brokerageName={brokerageName}
             onToggleSidebar={() => setSidebarCollapsed((current) => !current)}
             onOpenDrawer={() => setMobileDrawerOpen(true)}
-            onOpenSheet={() => setMobileSheetOpen(true)}
-            onLogout={handleLogout}
             mobile={isMobile}
           />
 
@@ -273,10 +246,6 @@ export function Dashboard() {
             <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} />
           </section>
         </main>
-
-        <aside className="shell-panel">
-          <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} />
-        </aside>
       </div>
 
       {isMobile && mobileDrawerOpen ? (
@@ -292,15 +261,6 @@ export function Dashboard() {
               assistantBrand={assistantBrand}
               brokerageName={brokerageName}
             />
-          </div>
-        </>
-      ) : null}
-
-      {isMobile && mobileSheetOpen ? (
-        <>
-          <button className="sheet-overlay" onClick={() => setMobileSheetOpen(false)} aria-label="Close context sheet" />
-          <div className="sheet">
-            <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} />
           </div>
         </>
       ) : null}

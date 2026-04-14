@@ -679,14 +679,10 @@
   }
 }
 
-.top-bar__logout {
-  min-width: 84px;
-}
-
-.top-bar__menu-button,
-.top-bar__context-button {
-  min-width: 0;
-  padding-inline: var(--space-2);
+.top-bar__menu-button {
+  min-width: 40px;
+  width: 40px;
+  padding: 0;
 }
 
 .top-bar__burger {
@@ -703,8 +699,7 @@
   background: currentColor;
 }
 
-.drawer-overlay,
-.sheet-overlay {
+.drawer-overlay {
   position: fixed;
   inset: 0;
   background: var(--bg-overlay);
@@ -712,8 +707,7 @@
   z-index: 40;
 }
 
-.drawer,
-.sheet {
+.drawer {
   position: fixed;
   z-index: 45;
   background: var(--bg-menu);
@@ -729,14 +723,6 @@
   overflow: auto;
 }
 
-.sheet {
-  inset: auto 0 0 0;
-  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-  padding: var(--space-4);
-  animation: sheetIn var(--duration-standard) var(--ease-standard);
-  overflow: auto;
-}
-
 @keyframes slideInLeft {
   from {
     transform: translateX(-12px);
@@ -745,18 +731,6 @@
 
   to {
     transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes sheetIn {
-  from {
-    transform: translateY(8px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -800,10 +774,6 @@
     max-width: calc(100% - 116px);
   }
 
-  .context-panel {
-    padding: 0;
-  }
-
   .workspace-header__title {
     font-size: 20px;
     line-height: 24px;
@@ -828,11 +798,6 @@
     width: 100%;
   }
 
-  .top-bar__right {
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-  }
-
   .sidebar {
     padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
   }
@@ -850,15 +815,7 @@
     grid-template-columns: 1fr;
   }
 
-  .top-bar__menu-button,
-  .top-bar__context-button {
+  .top-bar__menu-button {
     height: 40px;
-    padding-inline: var(--space-2);
-  }
-
-  .top-bar__menu-button span:last-child,
-  .top-bar__context-button {
-    font-size: 12px;
-    line-height: 14px;
   }
 }
