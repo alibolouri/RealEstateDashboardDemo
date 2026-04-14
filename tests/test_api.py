@@ -1,6 +1,11 @@
 from backend.app.tools import search_listings
 
 
+def login_admin(client):
+    response = client.post("/admin/login", json={"username": "admin", "password": "secret-pass"})
+    assert response.status_code == 200
+
+
 def test_health_endpoint(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -81,3 +86,58 @@ def test_listing_search_tool_filters_by_city_and_bedrooms():
     assert results
     assert all(item["city"] == "Houston" for item in results)
     assert all(item["bedrooms"] >= 3 for item in results)
+
+
+def test_settings_requires_admin_session(client):
+    response = client.get("/settings")
+    assert response.status_code == 401
+
+    schema_response = client.get("/settings/schema")
+    assert schema_response.status_code == 401
+
+
+def test_settings_spa_route_serves_html(client):
+    response = client.get("/settings", headers={"accept": "text/html"})
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+
+
+def test_settings_update_masks_secret_and_applies_runtime_config(client):
+    login_admin(client)
+
+    response = client.put(
+        "/settings",
+        json={
+            "values": {
+                "BROKERAGE_NAME": "Configured Realty",
+                "BROKERAGE_CONTACT_NUMBER": "+1-800-CONFIG",
+                "LISTING_SOURCE_MODE": "har_mls",
+                "OPENAI_API_KEY": "sk-test-value",
+            }
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    values = {item["key"]: item for item in payload["values"]}
+
+    assert values["BROKERAGE_NAME"]["value"] == "Configured Realty"
+    assert values["OPENAI_API_KEY"]["value"] == "Configured"
+    assert values["OPENAI_API_KEY"]["is_set"] is True
+
+    health = client.get("/health").json()
+    assert health["brokerage_name"] == "Configured Realty"
+    assert health["listing_source_mode"] == "har_mls"
+
+    handoff = client.post("/handoff", json={"city": "Austin"}).json()
+    assert handoff["fixed_contact_number"] == "+1-800-CONFIG"
+
+
+def test_admin_session_and_logout(client):
+    login_admin(client)
+    session_response = client.get("/admin/session")
+    assert session_response.status_code == 200
+    assert session_response.json()["authenticated"] is True
+
+    logout_response = client.post("/admin/logout")
+    assert logout_response.status_code == 200
+    assert logout_response.json()["authenticated"] is False

@@ -9,6 +9,7 @@ type Props = {
   activeConversationId: string | null;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
+  onOpenSettings: () => void;
   onLogout: () => void;
   assistantBrand: string;
   brokerageName: string;
@@ -20,6 +21,7 @@ export function ConversationList({
   activeConversationId,
   onSelectConversation,
   onNewConversation,
+  onOpenSettings,
   onLogout,
   assistantBrand,
   brokerageName,
@@ -63,6 +65,10 @@ export function ConversationList({
       </section>
 
       <div className="sidebar__footer">
+        <button className="button button--ghost sidebar__utility" onClick={onOpenSettings} aria-label="Open runtime settings">
+          <span className="button__label">Settings</span>
+          {collapsed ? ">" : null}
+        </button>
         <button className="button button--secondary sidebar__logout" onClick={onLogout} aria-label="Clear active workspace">
           <span className="button__label">Log out</span>
           {collapsed ? ">" : null}

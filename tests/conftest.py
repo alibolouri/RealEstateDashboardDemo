@@ -22,6 +22,9 @@ def client(monkeypatch):
     monkeypatch.setenv("BROKERAGE_NAME", "Test Brokerage")
     monkeypatch.setenv("ASSISTANT_BRAND_NAME", "Test Concierge")
     monkeypatch.setenv("LISTING_SOURCE_MODE", "demo_json")
+    monkeypatch.setenv("ADMIN_USERNAME", "admin")
+    monkeypatch.setenv("ADMIN_PASSWORD", "secret-pass")
+    monkeypatch.setenv("SESSION_SECRET", "test-session-secret")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     for module_name in list(sys.modules):

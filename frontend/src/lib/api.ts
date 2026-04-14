@@ -62,29 +62,130 @@ export type Message = {
   data_status?: DataStatus | null;
 };
 
+export type SettingOption = {
+  value: string;
+  label: string;
+};
+
+export type SettingField = {
+  key: string;
+  label: string;
+  group: string;
+  kind: "text" | "password" | "url" | "number" | "select";
+  required: boolean;
+  secret: boolean;
+  placeholder?: string | null;
+  help_text?: string | null;
+  options?: SettingOption[];
+};
+
+export type SettingGroup = {
+  id: string;
+  label: string;
+  description?: string | null;
+  fields: SettingField[];
+};
+
+export type SettingValue = {
+  key: string;
+  value?: string | null;
+  is_set: boolean;
+  is_secret: boolean;
+};
+
+export type SettingsPayload = {
+  groups: SettingGroup[];
+  values: SettingValue[];
+};
+
+export type AdminSession = {
+  authenticated: boolean;
+  username?: string | null;
+};
+
+async function apiFetch(path: string, init?: RequestInit, includeCredentials = false): Promise<Response> {
+  return fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    credentials: includeCredentials ? "include" : init?.credentials,
+    headers: {
+      ...(init?.headers || {}),
+    }
+  });
+}
+
 export async function createConversation(): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/conversations`, { method: "POST" });
+  const response = await apiFetch("/conversations", { method: "POST" });
   if (!response.ok) throw new Error("Failed to create conversation");
   const payload = await response.json();
   return payload.conversation_id;
 }
 
 export async function fetchConversations(): Promise<Array<{ id: string; title: string; updated_at: string }>> {
-  const response = await fetch(`${API_BASE_URL}/conversations`);
+  const response = await apiFetch("/conversations");
   const payload = await response.json();
   return payload.conversations;
 }
 
 export async function getHistory(conversationId: string): Promise<Message[]> {
-  const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/history`);
+  const response = await apiFetch(`/conversations/${conversationId}/history`);
   if (!response.ok) throw new Error("Failed to fetch history");
   const payload = await response.json();
   return payload.messages;
 }
 
 export async function fetchHealth(): Promise<{ assistant_brand: string; brokerage_name: string; listing_source_mode: string }> {
-  const response = await fetch(`${API_BASE_URL}/health`);
+  const response = await apiFetch("/health");
   if (!response.ok) throw new Error("Failed to fetch health metadata");
+  return response.json();
+}
+
+export async function fetchAdminSession(): Promise<AdminSession> {
+  const response = await apiFetch("/admin/session", undefined, true);
+  if (!response.ok) throw new Error("Failed to fetch admin session");
+  return response.json();
+}
+
+export async function loginAdmin(username: string, password: string): Promise<AdminSession> {
+  const response = await apiFetch(
+    "/admin/login",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    },
+    true
+  );
+  if (!response.ok) throw new Error("Invalid admin credentials");
+  return response.json();
+}
+
+export async function logoutAdmin(): Promise<void> {
+  await apiFetch("/admin/logout", { method: "POST" }, true);
+}
+
+export async function fetchSettings(): Promise<SettingsPayload> {
+  const response = await apiFetch("/settings", undefined, true);
+  if (!response.ok) {
+    if (response.status === 401) throw new Error("unauthorized");
+    throw new Error("Failed to fetch settings");
+  }
+  return response.json();
+}
+
+export async function saveSettings(values: Record<string, string | null>): Promise<SettingsPayload> {
+  const response = await apiFetch(
+    "/settings",
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ values })
+    },
+    true
+  );
+  if (!response.ok) {
+    if (response.status === 401) throw new Error("unauthorized");
+    throw new Error("Failed to save settings");
+  }
   return response.json();
 }
 
@@ -96,7 +197,7 @@ export async function sendMessageStream(
   onComplete: () => void,
   onError: (error: string) => void
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages/stream`, {
+  const response = await apiFetch(`/conversations/${conversationId}/messages/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message })

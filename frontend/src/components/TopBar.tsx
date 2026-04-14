@@ -1,12 +1,11 @@
 type Props = {
   assistantBrand: string;
   brokerageName: string;
-  onToggleSidebar: () => void;
   onOpenDrawer: () => void;
   mobile: boolean;
 };
 
-export function TopBar({ assistantBrand, brokerageName, onToggleSidebar, onOpenDrawer, mobile }: Props) {
+export function TopBar({ assistantBrand, brokerageName, onOpenDrawer, mobile }: Props) {
   return (
     <header className="top-bar">
       <div className="top-bar__left">
@@ -18,11 +17,7 @@ export function TopBar({ assistantBrand, brokerageName, onToggleSidebar, onOpenD
               <span />
             </span>
           </button>
-        ) : (
-          <button className="button button--ghost" onClick={onToggleSidebar} aria-label="Toggle sidebar">
-            Pane
-          </button>
-        )}
+        ) : null}
 
         <div className="top-bar__heading">
           <div className="top-bar__title">{assistantBrand}</div>

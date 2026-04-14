@@ -1,9 +1,9 @@
 import json
-import os
 from collections.abc import AsyncIterator
 from typing import Any, TypedDict
 
-from backend.app.connectors import assistant_brand, brokerage_name
+from backend.app.config import config_optional_value, config_value
+from backend.app.connectors import active_connector_summary, assistant_brand, brokerage_name
 from backend.app.database import get_conversation_history, save_handoff, save_message
 from backend.app.models import AgentAnalysis, AgentContext, AgentEnvelope
 from backend.app.tools import (
@@ -48,7 +48,7 @@ class AgentState(TypedDict):
 
 
 def _llm_available() -> bool:
-    return ChatOpenAI is not None and StateGraph is not None and bool(os.getenv("OPENAI_API_KEY"))
+    return ChatOpenAI is not None and StateGraph is not None and bool(config_optional_value("OPENAI_API_KEY"))
 
 
 def _analysis_node(state: AgentState) -> AgentState:
@@ -71,6 +71,7 @@ def _source(type_: str, label: str, *, data_status: str = "demo", confidence: fl
 
 def _tool_node(state: AgentState) -> AgentState:
     analysis = AgentAnalysis(**state["analysis"])
+    connector_summary = active_connector_summary()
     listings: list[dict[str, Any]] = []
     listing_detail: dict[str, Any] | None = None
     guidance_hits: list[dict[str, Any]] = []
@@ -102,7 +103,13 @@ def _tool_node(state: AgentState) -> AgentState:
     if analysis.intent in {"buying_guidance", "renting_guidance", "selling_guidance", "area_question", "general_real_estate_qna"}:
         guidance_hits = search_guidance(state["user_message"], topic=analysis.topic)
         if guidance_hits:
-            sources.append(_source("knowledge_source", "Brokerage guidance library", confidence=0.92))
+            sources.append(
+                _source(
+                    "knowledge_source",
+                    f"Guidance source: {connector_summary['knowledge']['active_mode']}",
+                    confidence=0.92,
+                )
+            )
 
     if analysis.needs_handoff or analysis.intent == "handoff_request":
         listing_id = analysis.listing_id or (listings[0]["id"] if listings else None)
@@ -118,7 +125,13 @@ def _tool_node(state: AgentState) -> AgentState:
                 f"then ask for {realtor['name']} for local follow-up."
             ),
         }
-        sources.append(_source("routing_source", "Brokerage routing policy", confidence=1.0))
+        sources.append(
+            _source(
+                "routing_source",
+                f"Routing source: {connector_summary['routing']['active_mode']}",
+                confidence=1.0,
+            )
+        )
 
     data_status = "demo"
     if listings:
@@ -188,7 +201,7 @@ def _deterministic_response(state: AgentState) -> str:
 def _respond_node(state: AgentState) -> AgentState:
     llm_response = None
     if _llm_available():
-        model = ChatOpenAI(model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"), temperature=0)
+        model = ChatOpenAI(api_key=config_optional_value("OPENAI_API_KEY"), model=config_value("OPENAI_MODEL"), temperature=0)
         prompt = (
             f"{SYSTEM_PROMPT}\n\nAssistant brand: {assistant_brand()}\nBrokerage name: {brokerage_name()}\n\n"
             f"User message: {state['user_message']}\n\n"

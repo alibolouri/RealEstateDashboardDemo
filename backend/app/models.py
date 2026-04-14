@@ -96,6 +96,13 @@ class HealthResponse(BaseModel):
     listing_source_mode: str
     assistant_brand: str
     brokerage_name: str
+    active_listing_mode: str | None = None
+    active_knowledge_mode: str | None = None
+    active_routing_mode: str | None = None
+    listing_fallback_modes: list[str] = Field(default_factory=list)
+    knowledge_fallback_modes: list[str] = Field(default_factory=list)
+    routing_fallback_modes: list[str] = Field(default_factory=list)
+    connector_status: dict[str, Any] = Field(default_factory=dict)
 
 
 class HandoffRequest(BaseModel):
@@ -143,3 +150,57 @@ class AgentContext(BaseModel):
     listing_detail: dict[str, Any] | None = None
     guidance_hits: list[dict[str, Any]] = Field(default_factory=list)
     handoff: dict[str, Any] | None = None
+
+
+class SettingOption(BaseModel):
+    value: str
+    label: str
+
+
+class SettingField(BaseModel):
+    key: str
+    label: str
+    group: str
+    kind: str
+    required: bool = False
+    secret: bool = False
+    placeholder: str | None = None
+    help_text: str | None = None
+    options: list[SettingOption] = Field(default_factory=list)
+
+
+class SettingGroup(BaseModel):
+    id: str
+    label: str
+    description: str | None = None
+    fields: list[SettingField] = Field(default_factory=list)
+
+
+class SettingValue(BaseModel):
+    key: str
+    value: str | None = None
+    is_set: bool
+    is_secret: bool
+
+
+class SettingsSchemaResponse(BaseModel):
+    groups: list[SettingGroup]
+
+
+class SettingsReadResponse(BaseModel):
+    groups: list[SettingGroup]
+    values: list[SettingValue]
+
+
+class SettingsUpdateRequest(BaseModel):
+    values: dict[str, str | None] = Field(default_factory=dict)
+
+
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AdminSessionResponse(BaseModel):
+    authenticated: bool
+    username: str | None = None

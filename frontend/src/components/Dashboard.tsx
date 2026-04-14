@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
 import { ConversationList } from "./ConversationList";
 import { EmptyState } from "./EmptyState";
+import { SettingsPage } from "./SettingsPage";
 import { ThreadView } from "./ThreadView";
 import { TopBar } from "./TopBar";
 import {
@@ -10,6 +11,7 @@ import {
   fetchConversations,
   fetchHealth,
   getHistory,
+  logoutAdmin,
   sendMessageStream,
   type Message,
 } from "../lib/api";
@@ -40,14 +42,15 @@ function useMobileLayout() {
 }
 
 export function Dashboard() {
+  const initialView = window.location.pathname === "/settings" ? "settings" : "workspace";
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [assistantBrand, setAssistantBrand] = useState("Real Estate Concierge");
   const [brokerageName, setBrokerageName] = useState("Summit Realty Group");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [view, setView] = useState<"workspace" | "settings">(initialView);
   const endRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useMobileLayout();
 
@@ -86,6 +89,21 @@ export function Dashboard() {
     }
   }, [isMobile]);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      setView(window.location.pathname === "/settings" ? "settings" : "workspace");
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const navigateTo = (nextView: "workspace" | "settings") => {
+    const path = nextView === "settings" ? "/settings" : "/";
+    window.history.pushState({}, "", path);
+    setView(nextView);
+    setMobileDrawerOpen(false);
+  };
+
   const handleNewConversation = async () => {
     const conversationId = await createConversation();
     const conversation = {
@@ -96,17 +114,27 @@ export function Dashboard() {
     setConversations((current) => [conversation, ...current]);
     setActiveConversationId(conversationId);
     setMessages([]);
+    if (view !== "workspace") {
+      window.history.pushState({}, "", "/");
+      setView("workspace");
+    }
     setMobileDrawerOpen(false);
   };
 
   const handleSelectConversation = (conversationId: string) => {
     setActiveConversationId(conversationId);
+    if (view !== "workspace") {
+      window.history.pushState({}, "", "/");
+      setView("workspace");
+    }
     setMobileDrawerOpen(false);
   };
 
   const handleLogout = () => {
+    void logoutAdmin().catch(() => undefined);
     setActiveConversationId(null);
     setMessages([]);
+    navigateTo("workspace");
     setMobileDrawerOpen(false);
   };
 
@@ -215,17 +243,17 @@ export function Dashboard() {
 
   return (
     <>
-      <div className={`app-shell${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
+      <div className="app-shell">
         <aside className="shell-sidebar">
           <ConversationList
             conversations={conversations}
             activeConversationId={activeConversationId}
             onSelectConversation={handleSelectConversation}
             onNewConversation={() => void handleNewConversation()}
+            onOpenSettings={() => navigateTo("settings")}
             onLogout={handleLogout}
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
-            collapsed={sidebarCollapsed}
           />
         </aside>
 
@@ -233,17 +261,27 @@ export function Dashboard() {
           <TopBar
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
-            onToggleSidebar={() => setSidebarCollapsed((current) => !current)}
             onOpenDrawer={() => setMobileDrawerOpen(true)}
             mobile={isMobile}
           />
 
           <section className="workspace">
             <div className="workspace-scroll">
-              <div className="workspace-inner">{workspaceContent}</div>
+              <div className="workspace-inner">
+                {view === "settings" ? (
+                  <SettingsPage
+                    onRuntimeBrandingChange={(nextAssistantBrand, nextBrokerageName) => {
+                      setAssistantBrand(nextAssistantBrand);
+                      setBrokerageName(nextBrokerageName);
+                    }}
+                  />
+                ) : (
+                  workspaceContent
+                )}
+              </div>
             </div>
 
-            <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} />
+            {view === "workspace" ? <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} /> : null}
           </section>
         </main>
       </div>
@@ -257,6 +295,7 @@ export function Dashboard() {
               activeConversationId={activeConversationId}
               onSelectConversation={handleSelectConversation}
               onNewConversation={() => void handleNewConversation()}
+              onOpenSettings={() => navigateTo("settings")}
               onLogout={handleLogout}
               assistantBrand={assistantBrand}
               brokerageName={brokerageName}

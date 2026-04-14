@@ -32,14 +32,52 @@ The app is designed around three source classes:
   - realtor roster
   - service-area routing rules
 
+The runtime now supports:
+- primary and fallback listing providers
+- primary and fallback knowledge providers
+- primary and fallback routing providers
+- remote JSON-style APIs for listings, knowledge, and routing
+- local markdown guidance directories
+- connector readiness reporting through `/health`
+
 Every listing-backed response includes source provenance and data status:
 - `live`
 - `cached`
 - `demo`
 
+## Runtime settings
+- public chat remains open
+- runtime configuration is managed through `/settings`
+- settings are stored in the app database with `.env` acting as boot defaults
+- secret values are masked after save and applied on the next request
+
+Admin session env vars:
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+- `SESSION_SECRET`
+
+Platform-ready runtime fields:
+- `LISTING_SOURCE_MODE`
+- `LISTING_FALLBACK_MODES`
+- `LISTING_SEARCH_PATH`
+- `LISTING_DETAIL_PATH`
+- `KNOWLEDGE_SOURCE_MODE`
+- `KNOWLEDGE_FALLBACK_MODES`
+- `KNOWLEDGE_LOCAL_PATH`
+- `KNOWLEDGE_REMOTE_URL`
+- `ROUTING_SOURCE_MODE`
+- `ROUTING_FALLBACK_MODES`
+- `EXTERNAL_ROSTER_URL`
+
 ## API
 - `GET /`
 - `GET /health`
+- `GET /settings`
+- `GET /settings/schema`
+- `PUT /settings`
+- `POST /admin/login`
+- `POST /admin/logout`
+- `GET /admin/session`
 - `GET /conversations`
 - `POST /conversations`
 - `POST /conversations/{conversation_id}/messages`
@@ -58,6 +96,9 @@ Core settings:
 - `BROKERAGE_CONTACT_NUMBER`
 - `ASSISTANT_BRAND_NAME`
 - `LISTING_SOURCE_MODE`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+- `SESSION_SECRET`
 
 ## Local setup
 
@@ -91,6 +132,7 @@ Backend runs on `http://localhost:8000`. Frontend runs on `http://localhost:5173
 - demo listings model an MLS-like normalized feed
 - the app remains fully usable without an OpenAI key through deterministic fallback behavior
 - with `OPENAI_API_KEY`, the LangGraph/OpenAI path becomes active
+- if a configured live source is unavailable, the app falls back through the configured provider chain and can end on sample listings instead of failing hard
 
 ## MLS integration path
 This codebase is intentionally staged:
@@ -102,6 +144,7 @@ This codebase is intentionally staged:
 ### Phase 2
 - add an official MLS / RESO / IDX / broker-approved feed connector
 - introduce sync and caching while preserving the same chat and API contract
+- point `MLS_API_BASE_URL`, `BROKER_FEED_API_BASE_URL`, or related runtime settings at a real provider without changing the UI or the agent contract
 
 ### Phase 3
 - support multiple approved feeds

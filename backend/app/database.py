@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 
@@ -63,6 +64,14 @@ class Handoff(Base):
     recommended_realtor_id: Mapped[str] = mapped_column(String(120), nullable=False)
     reason: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+
+
+class Setting(Base):
+    __tablename__ = "settings"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
 
 def init_db() -> None:
@@ -162,3 +171,32 @@ def save_handoff(
         db.commit()
         db.refresh(handoff)
         return handoff.id
+
+
+def get_settings_map() -> dict[str, str]:
+    with SessionLocal() as db:
+        try:
+            rows = db.query(Setting).all()
+        except OperationalError:
+            return {}
+        return {row.key: row.value for row in rows if row.value is not None}
+
+
+def get_setting(key: str) -> str | None:
+    with SessionLocal() as db:
+        row = db.get(Setting, key)
+        return row.value if row else None
+
+
+def upsert_settings(values: dict[str, str | None]) -> None:
+    with SessionLocal() as db:
+        now = datetime.now(UTC)
+        for key, value in values.items():
+            row = db.get(Setting, key)
+            if row is None:
+                row = Setting(key=key, value=value, updated_at=now)
+                db.add(row)
+            else:
+                row.value = value
+                row.updated_at = now
+        db.commit()
