@@ -38,8 +38,10 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
+  appearance: none;
 }
 
 button {
@@ -74,6 +76,10 @@ ol {
 
 textarea {
   resize: none;
+}
+
+[aria-disabled="true"] {
+  pointer-events: none;
 }
 
 :focus-visible {

@@ -14,7 +14,10 @@ export function HandoffCard({ handoff }: { handoff: HandoffCardType }) {
           <strong>{handoff.recommended_realtor.name}</strong>
         </div>
       </div>
-      <div className="u-muted">{handoff.recommended_realtor.specialty}</div>
+      <div className="handoff-card__meta">
+        <div className="u-muted">{handoff.recommended_realtor.specialty}</div>
+        <div className="u-tertiary">{handoff.recommended_realtor.phone}</div>
+      </div>
       <div className="handoff-card__reason">{handoff.reason}</div>
       <div className="callout-note">{handoff.next_step_message}</div>
     </article>

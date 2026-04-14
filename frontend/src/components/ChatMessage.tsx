@@ -1,7 +1,15 @@
 import type { Message } from "../lib/api";
 import { RunBlock } from "./RunBlock";
 
-export function ChatMessage({ message, assistantLabel }: { message: Message; assistantLabel: string }) {
+export function ChatMessage({
+  message,
+  assistantLabel,
+  isStreaming = false
+}: {
+  message: Message;
+  assistantLabel: string;
+  isStreaming?: boolean;
+}) {
   return (
     <RunBlock
       role={message.role === "user" ? "user" : "assistant"}
@@ -10,6 +18,7 @@ export function ChatMessage({ message, assistantLabel }: { message: Message; ass
       listingResults={message.listing_results}
       handoff={message.handoff}
       sources={message.sources}
+      isStreaming={isStreaming}
     />
   );
 }

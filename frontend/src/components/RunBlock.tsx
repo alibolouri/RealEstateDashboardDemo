@@ -22,6 +22,8 @@ export function RunBlock({
   sources = [],
   isStreaming = false
 }: Props) {
+  const bodyContent = content.trim().length > 0 ? content : isStreaming ? "Running the current request against the active workspace context." : "No response content.";
+
   return (
     <article className={`panel run-block run-block--${role}${isStreaming ? " run-block--streaming" : ""}`}>
       <div className="run-block__header">
@@ -37,7 +39,7 @@ export function RunBlock({
         </div>
       </div>
 
-      <div className="run-block__body">{content}</div>
+      <div className={`run-block__body${content.trim().length === 0 ? " run-block__body--placeholder" : ""}`}>{bodyContent}</div>
 
       {listingResults.length > 0 ? (
         <section className="run-section">

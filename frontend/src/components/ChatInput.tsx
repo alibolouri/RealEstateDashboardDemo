@@ -3,10 +3,9 @@ import { FormEvent, KeyboardEvent, useMemo, useState } from "react";
 type Props = {
   onSend: (text: string) => void;
   disabled: boolean;
-  sourceModeLabel: string;
 };
 
-export function ChatInput({ onSend, disabled, sourceModeLabel }: Props) {
+export function ChatInput({ onSend, disabled }: Props) {
   const [value, setValue] = useState("");
 
   const trimmed = value.trim();
@@ -35,20 +34,20 @@ export function ChatInput({ onSend, disabled, sourceModeLabel }: Props) {
   };
 
   return (
-    <form className="composer" onSubmit={handleSubmit}>
+    <form className="composer" onSubmit={handleSubmit} aria-busy={disabled}>
       <div className="composer__shell">
         <textarea
           className="composer__textarea"
           value={value}
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKeyDown}
+          aria-label="Message the real estate concierge"
           placeholder="Ask for listings, financing guidance, neighborhood trade-offs, or a human handoff."
           rows={3}
         />
 
         <div className="composer__actions">
           <div className="composer__meta">
-            <span className="micro-pill">{sourceModeLabel}</span>
             <span className="composer__status">{statusText}</span>
             {disabled ? (
               <span className="streaming-indicator">
@@ -62,7 +61,7 @@ export function ChatInput({ onSend, disabled, sourceModeLabel }: Props) {
             ) : null}
           </div>
 
-          <button className="button button--primary" type="submit" disabled={!canSend}>
+          <button className="button button--primary composer__send" type="submit" disabled={!canSend} aria-disabled={!canSend}>
             {disabled ? "Running..." : "Send"}
           </button>
         </div>

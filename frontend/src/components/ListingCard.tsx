@@ -16,6 +16,7 @@ export function ListingCard({ listing, compact = false }: Props) {
         <div>
           <div className="listing-card__title">{listing.title}</div>
           <div className="listing-card__location">{listing.city}, {listing.state}</div>
+          {!compact ? <div className="listing-card__address">{listing.address}</div> : null}
         </div>
         <span className="micro-pill">{listing.status}</span>
       </div>

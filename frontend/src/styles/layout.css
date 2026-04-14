@@ -3,6 +3,7 @@
   grid-template-columns: 264px minmax(0, 1fr) 360px;
   height: 100dvh;
   background: transparent;
+  overflow: hidden;
 }
 
 .app-shell.sidebar-collapsed {
@@ -22,12 +23,14 @@
   background: var(--bg-canvas);
   display: flex;
   flex-direction: column;
+  min-height: 100dvh;
 }
 
 .shell-panel {
   border-left: 1px solid var(--border-subtle);
   background: rgba(10, 13, 19, 0.82);
   min-width: 0;
+  min-height: 100dvh;
 }
 
 .top-bar {
@@ -43,6 +46,7 @@
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-header);
   backdrop-filter: blur(18px);
+  min-width: 0;
 }
 
 .top-bar__left,
@@ -83,8 +87,9 @@
 .workspace-scroll {
   min-height: 0;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: var(--space-6);
-  padding-bottom: 196px;
+  padding-bottom: 228px;
 }
 
 .workspace-inner {
@@ -96,14 +101,15 @@
   height: 100dvh;
   overflow: auto;
   padding: var(--space-6);
+  overscroll-behavior: contain;
 }
 
 .mobile-only {
-  display: none;
+  display: none !important;
 }
 
 .desktop-only {
-  display: inline-flex;
+  display: inline-flex !important;
 }
 
 .mobile-surface {
@@ -122,23 +128,23 @@
   }
 
   .mobile-only {
-    display: inline-flex;
+    display: inline-flex !important;
   }
 
   .desktop-only {
-    display: none;
+    display: none !important;
   }
 
   .top-bar {
-    height: auto;
+    height: 56px;
     min-height: 56px;
     padding: var(--space-3) var(--space-4);
-    align-items: flex-start;
+    align-items: center;
   }
 
   .workspace-scroll {
     padding: var(--space-4);
-    padding-bottom: 224px;
+    padding-bottom: calc(212px + env(safe-area-inset-bottom));
   }
 
   .mobile-surface {
@@ -147,8 +153,16 @@
 
   .top-bar__left,
   .top-bar__right {
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-2);
+  }
+
+  .top-bar__left {
+    flex: 1 1 auto;
+  }
+
+  .top-bar__right {
+    flex: 0 0 auto;
   }
 
   .top-bar__title {
@@ -157,10 +171,15 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 160px;
+    max-width: 176px;
   }
 
   .top-bar__subtitle {
     display: none;
+  }
+
+  .context-panel {
+    height: auto;
+    max-height: min(72dvh, 640px);
   }
 }

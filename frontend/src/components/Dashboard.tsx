@@ -4,7 +4,6 @@ import { ChatInput } from "./ChatInput";
 import { ConversationList } from "./ConversationList";
 import { DetailPanel } from "./DetailPanel";
 import { EmptyState } from "./EmptyState";
-import { MobileNav, type MobileView } from "./MobileNav";
 import { ThreadView } from "./ThreadView";
 import { TopBar } from "./TopBar";
 import {
@@ -44,19 +43,6 @@ function useMobileLayout() {
   return isMobile;
 }
 
-function formatSourceMode(sourceMode: string) {
-  switch (sourceMode) {
-    case "demo_json":
-      return "Sample listings";
-    case "live":
-      return "Live feed";
-    case "cached":
-      return "Cached feed";
-    default:
-      return sourceMode.replace(/[_-]/g, " ");
-  }
-}
-
 export function Dashboard() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -67,21 +53,17 @@ export function Dashboard() {
   const [panelSources, setPanelSources] = useState<SourceCitation[]>([]);
   const [assistantBrand, setAssistantBrand] = useState("Real Estate Concierge");
   const [brokerageName, setBrokerageName] = useState("Summit Realty Group");
-  const [sourceMode, setSourceMode] = useState("demo_json");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
-  const [mobileView, setMobileView] = useState<MobileView>("workspace");
   const endRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useMobileLayout();
-  const sourceModeLabel = useMemo(() => formatSourceMode(sourceMode), [sourceMode]);
 
   useEffect(() => {
     void fetchHealth()
       .then((payload) => {
         setAssistantBrand(payload.assistant_brand);
         setBrokerageName(payload.brokerage_name);
-        setSourceMode(payload.listing_source_mode);
       })
       .catch(() => undefined);
 
@@ -116,7 +98,6 @@ export function Dashboard() {
     if (!isMobile) {
       setMobileDrawerOpen(false);
       setMobileSheetOpen(false);
-      setMobileView("workspace");
     }
   }, [isMobile]);
 
@@ -133,13 +114,11 @@ export function Dashboard() {
     setPanelListings([]);
     setPanelHandoff(null);
     setPanelSources([]);
-    setMobileView("workspace");
     setMobileDrawerOpen(false);
   };
 
   const handleSelectConversation = (conversationId: string) => {
     setActiveConversationId(conversationId);
-    setMobileView("workspace");
     setMobileDrawerOpen(false);
   };
 
@@ -151,7 +130,6 @@ export function Dashboard() {
     setPanelSources([]);
     setMobileDrawerOpen(false);
     setMobileSheetOpen(false);
-    setMobileView("workspace");
   };
 
   const handleSendMessage = async (content: string) => {
@@ -178,7 +156,6 @@ export function Dashboard() {
     };
     setMessages((current) => [...current, userMessage, assistantPlaceholder]);
     setIsLoading(true);
-    setMobileView("workspace");
 
     await sendMessageStream(
       conversationId,
@@ -236,56 +213,30 @@ export function Dashboard() {
 
   const activePlaceholder = useMemo(() => messages.length === 0, [messages.length]);
 
-  const mobileContent = (() => {
-    switch (mobileView) {
-      case "threads":
-        return (
-          <ConversationList
-            conversations={conversations}
-            activeConversationId={activeConversationId}
-            onSelectConversation={handleSelectConversation}
-            onNewConversation={() => void handleNewConversation()}
-            onLogout={handleLogout}
-            assistantBrand={assistantBrand}
-            brokerageName={brokerageName}
-          />
-        );
-      case "listings":
-        return <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} mode="listings" />;
-      case "handoff":
-        return <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} mode="handoff" />;
-      case "sources":
-        return <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} mode="sources" />;
-      case "workspace":
-      default:
-        return (
-          <div className="workspace-header">
-            <div className="workspace-header__intro">
-              <div className="workspace-header__copy">
-                <div className="workspace-header__eyebrow">Agent workspace</div>
-                <div className="workspace-header__title">{assistantBrand}</div>
-                <p className="workspace-header__body">
-                  A structured run surface for listing retrieval, guidance, provenance, and brokerage handoff. The backend streaming and conversation contracts remain unchanged.
-                </p>
-              </div>
-              <div className="workspace-meta">
-                <span className="status-pill status-pill--healthy">healthy</span>
-                <span className="status-pill status-pill--demo">{sourceModeLabel}</span>
-              </div>
-            </div>
+  const workspaceContent = (
+    <div className="workspace-header">
+      <div className="workspace-header__intro">
+        <div className="workspace-header__copy">
+          <div className="workspace-header__eyebrow">Agent workspace</div>
+          <div className="workspace-header__title">{assistantBrand}</div>
+          <p className="workspace-header__body">
+            {isMobile
+              ? "A structured run surface for listing retrieval, guidance, provenance, and brokerage handoff."
+              : "A calm, structured operator surface for listing runs, guidance, provenance, and routed handoff."}
+          </p>
+        </div>
+      </div>
 
-            {activePlaceholder ? (
-              <EmptyState prompts={STARTER_PROMPTS} onPrompt={(prompt) => void handleSendMessage(prompt)} />
-            ) : (
-              <>
-                <ThreadView messages={messages} assistantLabel={assistantBrand} isLoading={isLoading} />
-                <div ref={endRef} />
-              </>
-            )}
-          </div>
-        );
-    }
-  })();
+      {activePlaceholder ? (
+        <EmptyState prompts={STARTER_PROMPTS} onPrompt={(prompt) => void handleSendMessage(prompt)} />
+      ) : (
+        <>
+          <ThreadView messages={messages} assistantLabel={assistantBrand} isLoading={isLoading} />
+          <div ref={endRef} />
+        </>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -307,7 +258,6 @@ export function Dashboard() {
           <TopBar
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
-            sourceModeLabel={sourceModeLabel}
             onToggleSidebar={() => setSidebarCollapsed((current) => !current)}
             onOpenDrawer={() => setMobileDrawerOpen(true)}
             onOpenSheet={() => setMobileSheetOpen(true)}
@@ -317,39 +267,10 @@ export function Dashboard() {
 
           <section className="workspace">
             <div className="workspace-scroll">
-              <div className="workspace-inner">
-                {isMobile ? (
-                  mobileContent
-                ) : (
-                  <div className="workspace-header">
-                    <div className="workspace-header__intro">
-                      <div className="workspace-header__copy">
-                        <div className="workspace-header__eyebrow">Agent workspace</div>
-                        <div className="workspace-header__title">{assistantBrand}</div>
-                        <p className="workspace-header__body">
-                          A calm, structured operator surface for real-estate runs. Threads stay dense, listings stay contextual, and handoff remains elevated without disrupting the workspace.
-                        </p>
-                      </div>
-                      <div className="workspace-meta">
-                        <span className="status-pill status-pill--healthy">healthy</span>
-                        <span className="status-pill status-pill--demo">{sourceModeLabel}</span>
-                      </div>
-                    </div>
-
-                    {activePlaceholder ? (
-                      <EmptyState prompts={STARTER_PROMPTS} onPrompt={(prompt) => void handleSendMessage(prompt)} />
-                    ) : (
-                      <>
-                        <ThreadView messages={messages} assistantLabel={assistantBrand} isLoading={isLoading} />
-                        <div ref={endRef} />
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
+              <div className="workspace-inner">{workspaceContent}</div>
             </div>
 
-            <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} sourceModeLabel={sourceModeLabel} />
+            <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} />
           </section>
         </main>
 
@@ -357,8 +278,6 @@ export function Dashboard() {
           <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} />
         </aside>
       </div>
-
-      {isMobile ? <MobileNav activeView={mobileView} onChange={setMobileView} /> : null}
 
       {isMobile && mobileDrawerOpen ? (
         <>

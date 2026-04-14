@@ -44,22 +44,26 @@ export function ConversationList({
       <section className="sidebar__section">
         <div className="sidebar__section-title">Threads</div>
         <div className="conversation-list">
-          {conversations.map((conversation) => (
-            <button
-              key={conversation.id}
-              className={`conversation-row${activeConversationId === conversation.id ? " is-active" : ""}`}
-              onClick={() => onSelectConversation(conversation.id)}
-              aria-label={conversation.title || "New conversation"}
-            >
-              <div className="conversation-row__title">{conversation.title || "New conversation"}</div>
-              <div className="conversation-row__time">{new Date(conversation.updated_at).toLocaleString()}</div>
-            </button>
-          ))}
+          {conversations.length > 0 ? (
+            conversations.map((conversation) => (
+              <button
+                key={conversation.id}
+                className={`conversation-row${activeConversationId === conversation.id ? " is-active" : ""}`}
+                onClick={() => onSelectConversation(conversation.id)}
+                aria-label={conversation.title || "New conversation"}
+              >
+                <div className="conversation-row__title">{conversation.title || "New conversation"}</div>
+                <div className="conversation-row__time">{new Date(conversation.updated_at).toLocaleString()}</div>
+              </button>
+            ))
+          ) : (
+            <div className="panel callout-note">Start a new conversation to create your first agent thread.</div>
+          )}
         </div>
       </section>
 
       <div className="sidebar__footer">
-        <button className="button button--secondary sidebar__logout" onClick={onLogout}>
+        <button className="button button--secondary sidebar__logout" onClick={onLogout} aria-label="Clear active workspace">
           <span className="button__label">Log out</span>
           {collapsed ? ">" : null}
         </button>

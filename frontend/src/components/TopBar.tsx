@@ -1,7 +1,6 @@
 type Props = {
   assistantBrand: string;
   brokerageName: string;
-  sourceModeLabel: string;
   onToggleSidebar: () => void;
   onOpenDrawer: () => void;
   onOpenSheet: () => void;
@@ -12,7 +11,6 @@ type Props = {
 export function TopBar({
   assistantBrand,
   brokerageName,
-  sourceModeLabel,
   onToggleSidebar,
   onOpenDrawer,
   onOpenSheet,
@@ -23,8 +21,13 @@ export function TopBar({
     <header className="top-bar">
       <div className="top-bar__left">
         {mobile ? (
-          <button className="button button--ghost mobile-only" onClick={onOpenDrawer} aria-label="Open threads">
-            Menu
+          <button className="button button--ghost mobile-only top-bar__menu-button" onClick={onOpenDrawer} aria-label="Open threads menu">
+            <span className="top-bar__burger" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+            <span>Menu</span>
           </button>
         ) : (
           <button className="button button--ghost" onClick={onToggleSidebar} aria-label="Toggle sidebar">
@@ -39,9 +42,7 @@ export function TopBar({
       </div>
 
       <div className="top-bar__right">
-        <span className="status-pill status-pill--healthy">healthy</span>
-        {!mobile ? <span className="status-pill status-pill--demo">{sourceModeLabel}</span> : null}
-        <button className="button button--ghost mobile-only" onClick={onOpenSheet}>
+        <button className="button button--ghost mobile-only top-bar__context-button" onClick={onOpenSheet} aria-label="Open context">
           Context
         </button>
         {!mobile ? (
