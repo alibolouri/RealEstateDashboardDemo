@@ -9,8 +9,21 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 
+def _running_on_vercel() -> bool:
+    return os.getenv("VERCEL") == "1"
+
+
+def _normalize_database_url(database_url: str) -> str:
+    if not database_url:
+        return database_url
+    if _running_on_vercel() and database_url.startswith("sqlite:///./"):
+        filename = database_url.replace("sqlite:///./", "", 1)
+        return f"sqlite:////tmp/{filename}"
+    return database_url
+
+
 def _default_database_url() -> str:
-    return os.getenv("DATABASE_URL", "sqlite:///./real_estate_concierge.db")
+    return _normalize_database_url(os.getenv("DATABASE_URL", "sqlite:///./real_estate_concierge.db"))
 
 
 def _engine_kwargs(database_url: str) -> dict:
@@ -77,6 +90,8 @@ class Setting(Base):
 def init_db() -> None:
     if DATABASE_URL.startswith("sqlite:///./"):
         Path(DATABASE_URL.replace("sqlite:///", "")).touch(exist_ok=True)
+    elif DATABASE_URL.startswith("sqlite:////tmp/"):
+        Path(DATABASE_URL.replace("sqlite:////", "/")).touch(exist_ok=True)
     Base.metadata.create_all(bind=engine)
 
 
