@@ -55,7 +55,6 @@ export function ConversationList({
                 aria-label={conversation.title || "New conversation"}
               >
                 <div className="conversation-row__title">{conversation.title || "New conversation"}</div>
-                <div className="conversation-row__time">{new Date(conversation.updated_at).toLocaleString()}</div>
               </button>
             ))
           ) : (
@@ -65,7 +64,7 @@ export function ConversationList({
       </section>
 
       <div className="sidebar__footer">
-        <button className="button button--ghost sidebar__utility" onClick={onOpenSettings} aria-label="Open runtime settings">
+        <button className="button button--secondary sidebar__logout" onClick={onOpenSettings} aria-label="Open runtime settings">
           <span className="button__label">Settings</span>
           {collapsed ? ">" : null}
         </button>

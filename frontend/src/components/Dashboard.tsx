@@ -52,7 +52,71 @@ export function Dashboard() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [view, setView] = useState<"workspace" | "settings">(initialView);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const streamQueueRef = useRef("");
+  const streamMetaRef = useRef<Partial<Message> | null>(null);
+  const streamFinalizeRef = useRef<(() => void) | null>(null);
+  const streamTimerRef = useRef<number | null>(null);
   const isMobile = useMobileLayout();
+
+  const stopStreamAnimator = () => {
+    if (streamTimerRef.current !== null) {
+      window.clearInterval(streamTimerRef.current);
+      streamTimerRef.current = null;
+    }
+  };
+
+  const appendAssistantContent = (chunk: string) => {
+    if (!chunk) return;
+    setMessages((current) => {
+      const next = [...current];
+      const last = next[next.length - 1];
+      if (last && last.role === "assistant") {
+        next[next.length - 1] = { ...last, content: `${last.content}${chunk}` };
+      }
+      return next;
+    });
+  };
+
+  const applyPendingMeta = () => {
+    if (!streamMetaRef.current) return;
+    const meta = streamMetaRef.current;
+    streamMetaRef.current = null;
+    setMessages((current) => {
+      const next = [...current];
+      const last = next[next.length - 1];
+      if (last && last.role === "assistant") {
+        next[next.length - 1] = { ...last, ...meta };
+      }
+      return next;
+    });
+  };
+
+  const finalizeStreaming = () => {
+    applyPendingMeta();
+    if (streamFinalizeRef.current) {
+      const finalize = streamFinalizeRef.current;
+      streamFinalizeRef.current = null;
+      finalize();
+    }
+  };
+
+  const flushStreamQueue = () => {
+    if (!streamQueueRef.current.length) {
+      stopStreamAnimator();
+      finalizeStreaming();
+      return;
+    }
+
+    const chunk = streamQueueRef.current.slice(0, 2);
+    streamQueueRef.current = streamQueueRef.current.slice(2);
+    appendAssistantContent(chunk);
+  };
+
+  const ensureStreamAnimator = () => {
+    if (streamTimerRef.current === null) {
+      streamTimerRef.current = window.setInterval(flushStreamQueue, 18);
+    }
+  };
 
   useEffect(() => {
     void fetchHealth()
@@ -97,6 +161,12 @@ export function Dashboard() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      stopStreamAnimator();
+    };
+  }, []);
+
   const navigateTo = (nextView: "workspace" | "settings") => {
     const path = nextView === "settings" ? "/settings" : "/";
     window.history.pushState({}, "", path);
@@ -139,6 +209,10 @@ export function Dashboard() {
   };
 
   const handleSendMessage = async (content: string) => {
+    stopStreamAnimator();
+    streamQueueRef.current = "";
+    streamMetaRef.current = null;
+    streamFinalizeRef.current = null;
     let conversationId = activeConversationId;
     if (!conversationId) {
       conversationId = await createConversation();
@@ -167,40 +241,39 @@ export function Dashboard() {
       conversationId,
       content,
       (chunk) => {
-        setMessages((current) => {
-          const next = [...current];
-          const last = next[next.length - 1];
-          if (last && last.role === "assistant") {
-            next[next.length - 1] = { ...last, content: `${last.content}${chunk}` };
-          }
-          return next;
-        });
+        streamQueueRef.current += chunk;
+        ensureStreamAnimator();
       },
       (meta) => {
-        setMessages((current) => {
-          const next = [...current];
-          const last = next[next.length - 1];
-          if (last && last.role === "assistant") {
-            next[next.length - 1] = { ...last, ...meta };
-          }
-          return next;
-        });
+        streamMetaRef.current = meta;
+        if (!streamQueueRef.current.length && streamTimerRef.current === null) {
+          applyPendingMeta();
+        }
       },
       () => {
-        setIsLoading(false);
-        setConversations((current) =>
-          current.map((conversation) =>
-            conversation.id === conversationId
-              ? {
-                  ...conversation,
-                  title: conversation.title === "New conversation" ? content.slice(0, 48) : conversation.title,
-                  updated_at: new Date().toISOString()
-                }
-              : conversation
-          )
-        );
+        streamFinalizeRef.current = () => {
+          setIsLoading(false);
+          setConversations((current) =>
+            current.map((conversation) =>
+              conversation.id === conversationId
+                ? {
+                    ...conversation,
+                    title: conversation.title === "New conversation" ? content.slice(0, 48) : conversation.title,
+                    updated_at: new Date().toISOString()
+                  }
+                : conversation
+            )
+          );
+        };
+        if (!streamQueueRef.current.length && streamTimerRef.current === null) {
+          finalizeStreaming();
+        }
       },
       (error) => {
+        stopStreamAnimator();
+        streamQueueRef.current = "";
+        streamMetaRef.current = null;
+        streamFinalizeRef.current = null;
         setIsLoading(false);
         setMessages((current) => {
           const next = [...current];
