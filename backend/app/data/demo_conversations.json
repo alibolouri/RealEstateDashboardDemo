@@ -1,0 +1,328 @@
+[
+  {
+    "id": "demo-conv-houston-buyer",
+    "title": "Houston buyer shortlist and school trade-offs",
+    "created_at": "2026-04-14T14:05:00+00:00",
+    "updated_at": "2026-04-14T14:16:00+00:00",
+    "messages": [
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:05:00+00:00",
+        "content": "I am moving to Houston for work near the Medical Center. I want a 3-bedroom home under $600k, a manageable commute, and I care about public-school options."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:06:00+00:00",
+        "content": "I can narrow this down properly, but I need three decisions from you first.\n\n1. Is the $600k cap firm, or can I stretch slightly if the home is turnkey?\n2. Are you optimizing for shortest commute, strongest schools, or the most space for the price?\n3. Are you open to homes that need cosmetic work, or do you want something you can move into immediately?\n\nOnce you answer those, I will convert the search into a shortlist and explain the trade-offs in plain language."
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:08:00+00:00",
+        "content": "Keep it under $600k. Prioritize good day-to-day livability and schools over the absolute shortest commute. I prefer move-in ready, but light cosmetic work is fine."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:09:00+00:00",
+        "content": "Good. One more confirmation round so I do not overfit the wrong homes.\n\n- Payment comfort: should I assume you want the monthly payment to stay conservative, or is the purchase price the only hard limit?\n- Home style: detached single-family only, or would you consider a larger townhome if it improves location?\n- Outdoor space: must-have, nice-to-have, or not important?\n\nIf you answer those three, I will give you a clean recommendation with next steps."
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:11:00+00:00",
+        "content": "Please keep the payment conservative. Detached single-family only. Outdoor space is a nice-to-have, not mandatory."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:16:00+00:00",
+        "content": "Based on your constraints, I would frame the search this way:\n\n- Stay under the $600k ceiling and avoid homes that require a full renovation budget on top of closing costs.\n- Favor family-oriented Houston neighborhoods where day-to-day livability is stronger, even if the commute is not the absolute minimum.\n- Treat school fit and commute time as verification steps before touring, not assumptions.\n\nShortlist:\n- Montrose Family Residence at $465,000 is the strongest value play. It leaves more room for payment flexibility and post-close expenses.\n- The Heights Designer Bungalow at $585,000 is the sharper lifestyle option if you want more design polish and stronger turnkey appeal, but it leaves less margin for rate movement and closing costs.\n\nMy recommendation:\nStart with Montrose as the practical benchmark, then compare it against The Heights only if the finish level and neighborhood feel justify the higher monthly carrying cost.\n\nVerification steps before touring:\n1. Confirm the exact school assignment and boundary year for any address you shortlist.\n2. Check commute windows using your real arrival and departure times, not generic averages.\n3. Ask your lender for a payment scenario at your expected down payment plus taxes, insurance, and HOA assumptions.\n\nIf you want, I can hand this off to a Houston specialist and package the shortlist into a tour brief.",
+        "meta": {
+          "sources": [
+            {
+              "type": "listing_source",
+              "label": "Sample Houston listing feed",
+              "url": "https://www.reso.org/reso-web-api/",
+              "timestamp": "2026-04-14T14:16:00+00:00",
+              "confidence": 0.93,
+              "data_status": "demo"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "Consumer Financial Protection Bureau homebuying guide",
+              "url": "https://www.consumerfinance.gov/owning-a-home/",
+              "timestamp": "2026-04-14T14:16:00+00:00",
+              "confidence": 0.97,
+              "data_status": "live"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "GreatSchools school-search reference",
+              "url": "https://www.greatschools.org/",
+              "timestamp": "2026-04-14T14:16:00+00:00",
+              "confidence": 0.88,
+              "data_status": "live"
+            }
+          ],
+          "property_results": [
+            { "id": "prop-001" },
+            { "id": "prop-004" }
+          ],
+          "handoff": {
+            "fixed_contact_number": "__BROKERAGE_CONTACT_NUMBER__",
+            "recommended_realtor": {
+              "id": "realtor-001",
+              "name": "Maya Patel",
+              "phone": "+1-713-555-0101",
+              "email": "maya@example.com",
+              "specialty": "Houston family homes and relocation",
+              "cities_covered": ["Houston"],
+              "brokerage": "__BROKERAGE_NAME__"
+            },
+            "reason": "Matched by Houston service area and relocation focus",
+            "next_step_message": "Call the main brokerage line first, then ask for Maya Patel to turn this shortlist into a tour plan with school-boundary verification and commute timing."
+          },
+          "data_status": "demo"
+        }
+      }
+    ]
+  },
+  {
+    "id": "demo-conv-austin-renter",
+    "title": "Austin renter screening and shortlist",
+    "created_at": "2026-04-14T14:20:00+00:00",
+    "updated_at": "2026-04-14T14:30:00+00:00",
+    "messages": [
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:20:00+00:00",
+        "content": "Help me find an Austin rental for a hybrid commute to The Domain. I have a dog, I want parking, and I need to stay below $2,900."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:21:00+00:00",
+        "content": "I can turn that into a useful shortlist, but I need to force the important trade-offs first.\n\n1. Is the $2,900 cap all-in, or rent only?\n2. How often will you commute to The Domain each week?\n3. Are you willing to trade commute convenience for a larger or more character-driven unit?\n4. Does your dog need a yard, or is pet-friendly building policy enough?"
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:23:00+00:00",
+        "content": "The cap is rent only. I will commute three days a week. Pet-friendly building policy is enough. I would rather have a nicer unit than the shortest possible drive."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:24:00+00:00",
+        "content": "That helps. Final confirmation round:\n\n- Do you need two full bathrooms, or is one and a half acceptable?\n- Is covered parking required, or simply an assigned space?\n- Are you optimizing for polished building amenities or neighborhood character?"
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:26:00+00:00",
+        "content": "One and a half bathrooms is acceptable. An assigned space is fine. I care more about neighborhood character than building amenities."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:30:00+00:00",
+        "content": "Here is the clean read on your trade-offs.\n\nBest-fit options:\n- Domain Park Apartment at $2,450 is the efficient choice. It keeps the commute simpler and leaves room in your budget for move-in costs, pet fees, and parking-related extras.\n- East Austin Creative Loft at $2,895 is the character play. It sits right on your budget line, but it matches your preference for a more distinctive neighborhood experience.\n\nDecision framework:\n- Choose Domain Park if weekday efficiency matters more than the vibe outside the unit.\n- Choose East Austin Creative Loft if you are willing to pay for neighborhood energy and can absorb higher move-in friction.\n\nBefore you apply:\n1. Confirm the exact pet policy, breed restrictions, and monthly pet rent.\n2. Confirm whether the parking assignment is guaranteed in the lease itself.\n3. Verify commute times using your real arrival window, not generic map averages.\n4. Ask for the total move-in figure: first month, deposit, application fees, parking, pet fees, and utilities setup.\n\nIf you want, I can package this into an Austin rental handoff so a local agent can confirm policy details before you tour.",
+        "meta": {
+          "sources": [
+            {
+              "type": "listing_source",
+              "label": "Sample Austin rental feed",
+              "url": "https://www.reso.org/reso-web-api/",
+              "timestamp": "2026-04-14T14:30:00+00:00",
+              "confidence": 0.94,
+              "data_status": "demo"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "Texas Attorney General renters' rights overview",
+              "url": "https://www.texasattorneygeneral.gov/consumer-protection/home-real-estate-and-travel/renters-rights",
+              "timestamp": "2026-04-14T14:30:00+00:00",
+              "confidence": 0.96,
+              "data_status": "live"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "Austin moving and utilities checklist",
+              "url": "https://austinenergy.com/",
+              "timestamp": "2026-04-14T14:30:00+00:00",
+              "confidence": 0.82,
+              "data_status": "live"
+            }
+          ],
+          "property_results": [
+            { "id": "prop-006" },
+            { "id": "prop-008" }
+          ],
+          "handoff": {
+            "fixed_contact_number": "__BROKERAGE_CONTACT_NUMBER__",
+            "recommended_realtor": {
+              "id": "realtor-003",
+              "name": "Elena Brooks",
+              "phone": "+1-512-555-0111",
+              "email": "elena@example.com",
+              "specialty": "Austin rentals and relocation",
+              "cities_covered": ["Austin"],
+              "brokerage": "__BROKERAGE_NAME__"
+            },
+            "reason": "Matched by Austin rental specialization",
+            "next_step_message": "Start with the brokerage line, then ask Elena Brooks to verify pet policy, parking terms, and total move-in costs before you submit an application."
+          },
+          "data_status": "demo"
+        }
+      }
+    ]
+  },
+  {
+    "id": "demo-conv-dallas-financing",
+    "title": "Dallas payment planning and next steps",
+    "created_at": "2026-04-14T14:34:00+00:00",
+    "updated_at": "2026-04-14T14:45:00+00:00",
+    "messages": [
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:34:00+00:00",
+        "content": "Walk me through the monthly-payment trade-offs for buying a Dallas bungalow around $400k. I need the logic, not just listings."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:35:00+00:00",
+        "content": "Good request. To make the payment math meaningful, I need your assumptions before I estimate anything.\n\n1. Down payment range: 5%, 10%, 20%, or something else?\n2. Are you looking for a conservative all-in payment target, or are you fine stretching if the home quality is right?\n3. Do you want me to frame the answer around owner-occupied financing only, or should I include investor-style thinking as well?"
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:37:00+00:00",
+        "content": "Use 10% down. Keep the monthly payment conservative. Owner-occupied only."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:39:00+00:00",
+        "content": "One last clarification: are you comfortable with cosmetic updates if the price is attractive, or should I bias toward move-in-ready inventory even if the price is slightly higher?"
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:40:00+00:00",
+        "content": "Light cosmetic updates are fine, but I do not want a full renovation project."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:45:00+00:00",
+        "content": "Here is the practical framework.\n\nReference property:\n- Bishop Arts Bungalow at $379,000 is the cleaner benchmark for a conservative monthly payment.\n- Plano Edge Townhome at $425,000 is the stretch option if you decide price flexibility matters less than layout or location.\n\nHow the payment trade-off works:\n- With 10% down, the carrying-cost swing between the upper-$300k and low-$400k range is not just principal and interest. Taxes, insurance, and any HOA exposure move with the purchase decision.\n- That means a home that looks only $40k to $50k more expensive on paper can feel materially more expensive in the monthly budget once the full payment is modeled.\n\nA disciplined next step would be:\n1. Ask your lender for two side-by-side scenarios at your target rate assumptions.\n2. Include taxes, insurance, and any HOA cost in both cases.\n3. Keep cash-to-close visible, not just monthly payment.\n4. Preserve a repair reserve after closing so a cosmetic-refresh plan does not drain your emergency margin.\n\nRecommendation:\nUse Bishop Arts Bungalow as the baseline that defines your comfort zone. Only move up the price ladder if the higher-priced option solves a problem the cheaper home cannot solve.\n\nIf you want, I can hand this to a Dallas specialist who can pair lender scenarios with a tighter shortlist.",
+        "meta": {
+          "sources": [
+            {
+              "type": "listing_source",
+              "label": "Sample Dallas listing feed",
+              "url": "https://www.reso.org/reso-web-api/",
+              "timestamp": "2026-04-14T14:45:00+00:00",
+              "confidence": 0.92,
+              "data_status": "demo"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "CFPB mortgage and closing-cost guide",
+              "url": "https://www.consumerfinance.gov/owning-a-home/closing-disclosure/",
+              "timestamp": "2026-04-14T14:45:00+00:00",
+              "confidence": 0.97,
+              "data_status": "live"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "Freddie Mac My Home education center",
+              "url": "https://myhome.freddiemac.com/",
+              "timestamp": "2026-04-14T14:45:00+00:00",
+              "confidence": 0.9,
+              "data_status": "live"
+            }
+          ],
+          "property_results": [
+            { "id": "prop-012" },
+            { "id": "prop-009" }
+          ],
+          "handoff": {
+            "fixed_contact_number": "__BROKERAGE_CONTACT_NUMBER__",
+            "recommended_realtor": {
+              "id": "realtor-005",
+              "name": "Sophia Ramirez",
+              "phone": "+1-214-555-0199",
+              "email": "sophia@example.com",
+              "specialty": "Dallas first-time buyers and financing coordination",
+              "cities_covered": ["Dallas"],
+              "brokerage": "__BROKERAGE_NAME__"
+            },
+            "reason": "Matched by Dallas purchase advisory focus",
+            "next_step_message": "Call the brokerage line first, then ask Sophia Ramirez to coordinate lender scenarios against the Dallas shortlist before you tour."
+          },
+          "data_status": "demo"
+        }
+      }
+    ]
+  },
+  {
+    "id": "demo-conv-seller-handoff",
+    "title": "Seller prep and brokerage handoff",
+    "created_at": "2026-04-14T14:50:00+00:00",
+    "updated_at": "2026-04-14T14:58:00+00:00",
+    "messages": [
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:50:00+00:00",
+        "content": "I may list a family home in Houston this summer. I want a step-by-step prep checklist and then I want the right agent."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:51:00+00:00",
+        "content": "I can do that, but I need to place the timeline correctly.\n\n1. Are you trying to list within 30 days, 60 to 90 days, or later?\n2. Is the home already presentation-ready, or do you expect painting, repairs, or staging work?\n3. Are you optimizing for speed, top price, or a balance of both?"
+      },
+      {
+        "role": "user",
+        "created_at": "2026-04-14T14:53:00+00:00",
+        "content": "Probably 60 to 90 days. The house needs minor repairs and fresh paint. I want a balance of speed and top price."
+      },
+      {
+        "role": "assistant",
+        "created_at": "2026-04-14T14:58:00+00:00",
+        "content": "That timing is workable. Here is the prep sequence I would use.\n\nWeeks 1 to 2:\n- Get a pricing opinion before you spend on upgrades so you do not improve the wrong things.\n- Fix visible deferred maintenance: paint touch-ups, lighting, door hardware, landscaping, and any inspection-red-flag items.\n\nWeeks 2 to 4:\n- Declutter and depersonalize.\n- Create a staging plan for the living room, primary bedroom, and entry sequence.\n- Gather property documents: survey, repair records, warranties, HOA information, and utility-cost context.\n\nWeeks 4 to 6:\n- Approve photography timing only after the prep work is complete.\n- Decide your negotiation guardrails in advance: target price, minimum acceptable terms, ideal closing window, and any repair credits you would tolerate.\n\nWhy this sequence matters:\nIf you price first and prepare second, you protect margin. If you spend first and only price later, sellers often over-improve the wrong rooms.\n\nNext step:\nI would hand this to a Houston listing specialist now so the repair-and-staging plan stays tied to pricing reality instead of guesswork.",
+        "meta": {
+          "sources": [
+            {
+              "type": "knowledge_source",
+              "label": "National Association of REALTORS seller resources",
+              "url": "https://www.nar.realtor/sell",
+              "timestamp": "2026-04-14T14:58:00+00:00",
+              "confidence": 0.89,
+              "data_status": "live"
+            },
+            {
+              "type": "knowledge_source",
+              "label": "HUD home-selling and moving guidance",
+              "url": "https://www.hud.gov/topics/buying_a_home",
+              "timestamp": "2026-04-14T14:58:00+00:00",
+              "confidence": 0.78,
+              "data_status": "live"
+            },
+            {
+              "type": "routing_source",
+              "label": "Brokerage routing policy",
+              "url": "https://www.reso.org/reso-web-api/",
+              "timestamp": "2026-04-14T14:58:00+00:00",
+              "confidence": 0.91,
+              "data_status": "demo"
+            }
+          ],
+          "handoff": {
+            "fixed_contact_number": "__BROKERAGE_CONTACT_NUMBER__",
+            "recommended_realtor": {
+              "id": "realtor-002",
+              "name": "Jordan Lee",
+              "phone": "+1-713-555-0145",
+              "email": "jordan@example.com",
+              "specialty": "Houston listings, prep strategy, and pricing",
+              "cities_covered": ["Houston"],
+              "brokerage": "__BROKERAGE_NAME__"
+            },
+            "reason": "Matched by Houston seller advisory coverage",
+            "next_step_message": "Call the brokerage line first, then ask for Jordan Lee to turn the prep checklist into a price, repair, and staging sequence."
+          },
+          "data_status": "demo"
+        }
+      }
+    ]
+  }
+]

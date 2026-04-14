@@ -34,6 +34,11 @@ export function SourceList({ sources }: { sources: SourceCitation[] }) {
               {formatSourceType(source.type)} · {formatDataStatus(source.data_status)}
               {source.timestamp ? ` · ${new Date(source.timestamp).toLocaleString()}` : ""}
             </div>
+            {source.url ? (
+              <a className="source-card__link" href={source.url} target="_blank" rel="noreferrer">
+                Open source
+              </a>
+            ) : null}
           </div>
           <div className="source-card__confidence">{Math.round(source.confidence * 100)}%</div>
         </article>

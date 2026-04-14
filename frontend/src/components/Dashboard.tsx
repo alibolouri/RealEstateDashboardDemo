@@ -23,10 +23,10 @@ type Conversation = {
 };
 
 const STARTER_PROMPTS = [
-  "Find 3-bedroom homes in Houston under $500000",
-  "What should I know before renting in Austin?",
-  "Show me short stays in Miami Beach",
-  "Connect me to a realtor for Austin condos"
+  "Build me a Houston family-home shortlist under $600k and ask the right follow-up questions first.",
+  "Help me compare Austin rentals for a hybrid commute, pet policy, parking, and total move-in cost.",
+  "Walk me through Dallas monthly-payment trade-offs around a $400k purchase before recommending listings.",
+  "Give me a seller-ready prep checklist for Houston, then route me to the right agent."
 ];
 
 function useMobileLayout() {

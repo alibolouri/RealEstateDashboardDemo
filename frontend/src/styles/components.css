@@ -666,6 +666,26 @@
   font-size: 12px;
 }
 
+.source-card__link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-2);
+  color: var(--accent-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.source-card__link:hover {
+  color: var(--text-primary);
+}
+
+.source-card__link:focus-visible {
+  outline: none;
+  border-radius: var(--radius-xs);
+  box-shadow: var(--shadow-focus);
+}
+
 .context-panel__section {
   display: grid;
   gap: var(--space-3);

@@ -59,6 +59,7 @@ def _normalize_sources(sources: list[dict]) -> list[dict]:
             {
                 "type": source_type,
                 "label": source.get("label", "Unknown source"),
+                "url": source.get("url"),
                 "timestamp": source.get("timestamp"),
                 "confidence": source.get("confidence", 1.0),
                 "data_status": source.get("data_status", "demo"),

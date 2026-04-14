@@ -25,6 +25,7 @@ def client(monkeypatch):
     monkeypatch.setenv("ADMIN_USERNAME", "admin")
     monkeypatch.setenv("ADMIN_PASSWORD", "secret-pass")
     monkeypatch.setenv("SESSION_SECRET", "test-session-secret")
+    monkeypatch.setenv("SEED_DEMO_CONVERSATIONS", "0")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     for module_name in list(sys.modules):

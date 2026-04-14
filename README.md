@@ -1,6 +1,6 @@
 # White-Label MLS-Powered Real-Estate Agent
 
-A standalone real-estate AI concierge built as a 1-day trial MVP. It is white-label by design, uses a ChatGPT-style console, and is structured around official-feed-ready source connectors rather than treating local JSON as the long-term data architecture.
+A standalone real-estate AI concierge built as a trial MVP. It is white-label by design, uses a premium agent-workspace UI, and is structured around official-feed-ready source connectors rather than treating local JSON as the long-term data architecture.
 
 ## What it does
 - conversational listing search
@@ -9,6 +9,7 @@ A standalone real-estate AI concierge built as a 1-day trial MVP. It is white-la
 - brokerage-first human handoff
 - realtor recommendation by listing, city, then fallback
 - streaming chat responses with resumable conversations
+- seeded multi-turn demo threads with citations and clickable external references
 
 ## Current architecture
 - `backend/app/main.py`: FastAPI API and SSE streaming endpoints
@@ -16,8 +17,24 @@ A standalone real-estate AI concierge built as a 1-day trial MVP. It is white-la
 - `backend/app/connectors.py`: listing, knowledge, and routing source interfaces plus demo JSON connectors
 - `backend/app/tools.py`: query interpretation and connector-backed tool wrappers
 - `backend/app/database.py`: SQLite-backed conversation and handoff memory
-- `backend/app/data/*.json`: demo listing, realtor, and guidance content for the connector-ready trial
+- `backend/app/data/*.json`: demo listing, realtor, guidance, and seeded demo-conversation content for the connector-ready trial
 - `frontend/src/components/Dashboard.tsx`: standalone chat console
+
+## Demo conversations included
+When `SEED_DEMO_CONVERSATIONS=1`, a fresh database is populated with four realistic sample threads so the product does not open as an empty shell.
+
+Included demo threads:
+- Houston buyer shortlist and school trade-offs
+- Austin renter screening and shortlist
+- Dallas payment planning and next steps
+- Seller prep and brokerage handoff
+
+Each seeded thread includes:
+- multi-step narrowing questions from the assistant
+- explicit confirmations and choices from the user
+- complete final recommendations instead of placeholder one-liners
+- listing context and handoff cards where appropriate
+- cited sources with live external links for credibility
 
 ## Source model
 The app is designed around three source classes:
@@ -55,6 +72,7 @@ Admin session env vars:
 - `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
 - `SESSION_SECRET`
+- `SEED_DEMO_CONVERSATIONS`
 
 Platform-ready runtime fields:
 - `LISTING_SOURCE_MODE`
@@ -95,6 +113,7 @@ Core settings:
 - `BROKERAGE_NAME`
 - `BROKERAGE_CONTACT_NUMBER`
 - `ASSISTANT_BRAND_NAME`
+- `SEED_DEMO_CONVERSATIONS`
 - `LISTING_SOURCE_MODE`
 - `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
@@ -121,15 +140,16 @@ npm run dev
 Backend runs on `http://localhost:8000`. Frontend runs on `http://localhost:5173`.
 
 ## Example prompts
-- `Find 3-bedroom homes in Houston under $500000`
-- `What should I know before renting in Austin?`
-- `Show me short stays in Miami Beach`
-- `Tell me about prop-017`
-- `Connect me to a realtor for Austin condos`
+- `Build me a Houston family-home shortlist under $600k and ask the right follow-up questions first.`
+- `Help me compare Austin rentals for a hybrid commute, pet policy, parking, and total move-in cost.`
+- `Walk me through Dallas monthly-payment trade-offs around a $400k purchase before recommending listings.`
+- `Give me a seller-ready prep checklist for Houston, then route me to the right agent.`
+- `Tell me about prop-017 and explain the next best action.`
 
 ## Trial defaults
 - the active listing source is `demo_json`
 - demo listings model an MLS-like normalized feed
+- a fresh runtime includes seeded sample threads unless `SEED_DEMO_CONVERSATIONS=0`
 - the app remains fully usable without an OpenAI key through deterministic fallback behavior
 - with `OPENAI_API_KEY`, the LangGraph/OpenAI path becomes active
 - if a configured live source is unavailable, the app falls back through the configured provider chain and can end on sample listings instead of failing hard

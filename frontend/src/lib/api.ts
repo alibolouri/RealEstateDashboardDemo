@@ -5,6 +5,7 @@ export type DataStatus = "live" | "cached" | "demo";
 export type SourceCitation = {
   type: "listing_source" | "knowledge_source" | "routing_source";
   label: string;
+  url?: string | null;
   timestamp?: string | null;
   confidence: number;
   data_status: DataStatus;

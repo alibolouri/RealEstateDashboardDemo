@@ -11,6 +11,7 @@ SourceType = Literal["listing_source", "knowledge_source", "routing_source"]
 class SourceCitation(BaseModel):
     type: SourceType
     label: str
+    url: str | None = None
     timestamp: datetime | None = None
     confidence: float = Field(default=1.0, ge=0.0, le=1.0)
     data_status: DataStatus = "demo"

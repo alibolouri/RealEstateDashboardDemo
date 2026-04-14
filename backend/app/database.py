@@ -87,12 +87,66 @@ class Setting(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
 
+def _resolve_demo_placeholders(value):
+    substitutions = {
+        "__BROKERAGE_CONTACT_NUMBER__": os.getenv("BROKERAGE_CONTACT_NUMBER", "+1-888-555-0199"),
+        "__BROKERAGE_NAME__": os.getenv("BROKERAGE_NAME", "Summit Realty Group"),
+    }
+
+    if isinstance(value, str):
+        return substitutions.get(value, value)
+    if isinstance(value, list):
+        return [_resolve_demo_placeholders(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _resolve_demo_placeholders(item) for key, item in value.items()}
+    return value
+
+
+def _seed_demo_conversations() -> None:
+    if os.getenv("SEED_DEMO_CONVERSATIONS", "1") != "1":
+        return
+
+    seed_path = Path(__file__).resolve().parent / "data" / "demo_conversations.json"
+    if not seed_path.exists():
+        return
+
+    payload = _resolve_demo_placeholders(json.loads(seed_path.read_text(encoding="utf-8")))
+
+    with SessionLocal() as db:
+        if db.query(Conversation).first() is not None:
+            return
+
+        for thread in payload:
+            db.add(
+                Conversation(
+                    id=thread["id"],
+                    title=thread["title"],
+                    created_at=datetime.fromisoformat(thread["created_at"]),
+                    updated_at=datetime.fromisoformat(thread["updated_at"]),
+                )
+            )
+
+            for message in thread["messages"]:
+                db.add(
+                    Message(
+                        conversation_id=thread["id"],
+                        role=message["role"],
+                        content=message["content"],
+                        meta_json=json.dumps(message.get("meta"), default=str) if message.get("meta") else None,
+                        created_at=datetime.fromisoformat(message["created_at"]),
+                    )
+                )
+
+        db.commit()
+
+
 def init_db() -> None:
     if DATABASE_URL.startswith("sqlite:///./"):
         Path(DATABASE_URL.replace("sqlite:///", "")).touch(exist_ok=True)
     elif DATABASE_URL.startswith("sqlite:////tmp/"):
         Path(DATABASE_URL.replace("sqlite:////", "/")).touch(exist_ok=True)
     Base.metadata.create_all(bind=engine)
+    _seed_demo_conversations()
 
 
 def create_conversation() -> str:
