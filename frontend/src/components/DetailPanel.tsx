@@ -1,72 +1,86 @@
-import type { HandoffCard, ListingCard, SourceCitation } from "../lib/api";
+import type { HandoffCard as HandoffCardType, ListingCard as ListingCardType, SourceCitation } from "../lib/api";
+import { HandoffCard } from "./HandoffCard";
+import { ListingCard } from "./ListingCard";
+import { SourceList } from "./SourceList";
+
+type Mode = "all" | "listings" | "handoff" | "sources";
 
 type Props = {
-  listings: ListingCard[];
-  handoff: HandoffCard | null;
+  listings: ListingCardType[];
+  handoff: HandoffCardType | null;
   sources: SourceCitation[];
   brokerageName: string;
+  mode?: Mode;
 };
 
-function formatPrice(listing: ListingCard) {
-  return listing.listing_type === "short_stay" ? `$${listing.price}/night` : `$${listing.price.toLocaleString()}`;
+function shouldShow(section: Exclude<Mode, "all">, mode: Mode) {
+  return mode === "all" || mode === section;
 }
 
-export function DetailPanel({ listings, handoff, sources, brokerageName }: Props) {
+export function DetailPanel({ listings, handoff, sources, brokerageName, mode = "all" }: Props) {
   return (
-    <aside className="detail-panel">
-      <section className="panel-block">
-        <span className="eyebrow">Context</span>
-        <h2>Matched listings</h2>
-        {listings.length === 0 ? (
-          <p className="muted">Relevant listings will appear here once the assistant finds matches.</p>
-        ) : (
-          listings.map((listing) => (
-            <article className="property-card" key={listing.id}>
-              <div>
-                <strong>{listing.title}</strong>
-                <span>{listing.city}, {listing.state}</span>
-              </div>
-              <p>
-                {formatPrice(listing)} · {listing.bedrooms} bd · {listing.bathrooms} ba
-              </p>
-              <small>{listing.short_description}</small>
-              <small className="meta-line">{listing.source} · {listing.data_status}</small>
-            </article>
-          ))
-        )}
-      </section>
+    <div className="context-panel">
+      {shouldShow("listings", mode) ? (
+        <section className="context-panel__section">
+          <div>
+            <div className="run-section__title">Listings</div>
+            <div className="context-panel__section-title">Matched listings</div>
+            <div className="context-panel__section-copy">
+              Structured results from the active listing source appear here as the agent resolves the run.
+            </div>
+          </div>
 
-      <section className="panel-block">
-        <span className="eyebrow">Handoff</span>
-        <h2>{brokerageName} routing</h2>
-        {handoff ? (
-          <article className="handoff-card">
-            <p><strong>Brokerage:</strong> {handoff.fixed_contact_number}</p>
-            <p><strong>Realtor:</strong> {handoff.recommended_realtor.name}</p>
-            <p>{handoff.recommended_realtor.specialty}</p>
-            <small>{handoff.reason}</small>
-          </article>
-        ) : (
-          <p className="muted">When a user asks for human help, the routing card will appear here.</p>
-        )}
-      </section>
+          {listings.length > 0 ? (
+            <div className="listing-stack">
+              {listings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          ) : (
+            <div className="panel run-block">
+              <div className="run-block__body">No listing context yet. Ask for a city, budget, beds, or listing type.</div>
+            </div>
+          )}
+        </section>
+      ) : null}
 
-      <section className="panel-block">
-        <span className="eyebrow">Sources</span>
-        <h2>Grounding and provenance</h2>
-        {sources.length === 0 ? (
-          <p className="muted">Sources will appear once the assistant references listings, guidance documents, or routing policy.</p>
-        ) : (
-          <ul className="source-list">
-            {sources.map((source, index) => (
-              <li key={`${source.label}-${index}`}>
-                <strong>{source.label}</strong>
-                <span>{source.type.replace("_", " ")} · {source.data_status} · {Math.round(source.confidence * 100)}% confidence</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </aside>
+      {shouldShow("handoff", mode) ? (
+        <section className="context-panel__section">
+          <div>
+            <div className="run-section__title">Routing</div>
+            <div className="context-panel__section-title">{brokerageName} handoff</div>
+            <div className="context-panel__section-copy">
+              When the user requests human help, the fixed brokerage line and recommended realtor are elevated here.
+            </div>
+          </div>
+          {handoff ? (
+            <HandoffCard handoff={handoff} />
+          ) : (
+            <div className="panel run-block">
+              <div className="run-block__body">Handoff remains idle until the user asks to connect with a human specialist.</div>
+            </div>
+          )}
+        </section>
+      ) : null}
+
+      {shouldShow("sources", mode) ? (
+        <section className="context-panel__section">
+          <div>
+            <div className="run-section__title">Provenance</div>
+            <div className="context-panel__section-title">Sources and confidence</div>
+            <div className="context-panel__section-copy">
+              Every run can expose listing source provenance, routing policy, and knowledge confidence.
+            </div>
+          </div>
+          {sources.length > 0 ? (
+            <SourceList sources={sources} />
+          ) : (
+            <div className="panel run-block">
+              <div className="run-block__body">No source metadata yet. Guidance, listings, and routing will appear here when used.</div>
+            </div>
+          )}
+        </section>
+      ) : null}
+    </div>
   );
 }

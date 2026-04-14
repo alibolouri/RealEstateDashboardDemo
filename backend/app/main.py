@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,10 +12,70 @@ from backend.app.agent import create_handoff, run_agent, stream_agent
 from backend.app.connectors import assistant_brand, brokerage_name, listing_source_mode
 from backend.app.database import conversation_exists, create_conversation, get_conversation_history, init_db, list_conversations
 from backend.app.models import ConversationHistoryResponse, ConversationResponse, HealthResponse, HandoffRequest, HandoffResponse, MessageHistory, MessageRequest, MessageResponse
+from backend.app.tools import get_listing_details, listing_cards
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
+
+LEGACY_SOURCE_MAP = {
+    "property_data": "listing_source",
+    "market_knowledge": "knowledge_source",
+    "routing_policy": "routing_source",
+}
+
+
+def _normalize_sources(sources: list[dict]) -> list[dict]:
+    normalized = []
+    for source in sources:
+        source_type = LEGACY_SOURCE_MAP.get(source.get("type"), source.get("type", "knowledge_source"))
+        normalized.append(
+            {
+                "type": source_type,
+                "label": source.get("label", "Unknown source"),
+                "timestamp": source.get("timestamp"),
+                "confidence": source.get("confidence", 1.0),
+                "data_status": source.get("data_status", "demo"),
+            }
+        )
+    return normalized
+
+
+def _normalize_listing_results(meta: dict) -> list[dict]:
+    listing_results = meta.get("listing_results")
+    if listing_results:
+        return listing_results
+
+    property_results = meta.get("property_results") or []
+    if not property_results:
+        return []
+
+    enriched = []
+    for property_result in property_results:
+        listing_id = property_result.get("id")
+        if not listing_id:
+            continue
+        listing = get_listing_details(listing_id)
+        if listing:
+            enriched.extend(listing_cards([listing]))
+    return enriched
+
+
+def _normalize_handoff(handoff: dict | None) -> dict | None:
+    if not handoff:
+        return None
+
+    next_step_message = handoff.get("next_step_message", "")
+    if "Doorviser" in next_step_message:
+        recommended = handoff.get("recommended_realtor", {})
+        handoff = {
+            **handoff,
+            "next_step_message": (
+                f"Start with {brokerage_name()} at {handoff.get('fixed_contact_number', '')}, "
+                f"then continue with {recommended.get('name', 'the recommended realtor')}."
+            ).strip()
+        }
+    return handoff
 
 
 @asynccontextmanager
@@ -49,6 +109,11 @@ async def serve_frontend_root():
     if index_file.exists():
         return FileResponse(index_file)
     return RedirectResponse(url="/docs", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -114,9 +179,9 @@ async def get_history(conversation_id: str, limit: int = 100) -> ConversationHis
             role=row["role"],
             content=row["content"],
             created_at=row["created_at"],
-            sources=row["meta"].get("sources", []),
-            listing_results=row["meta"].get("listing_results", []),
-            handoff=row["meta"].get("handoff"),
+            sources=_normalize_sources(row["meta"].get("sources", [])),
+            listing_results=_normalize_listing_results(row["meta"]),
+            handoff=_normalize_handoff(row["meta"].get("handoff")),
             data_status=row["meta"].get("data_status"),
         )
         for row in rows

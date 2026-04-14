@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ChatInput } from "./ChatInput";
-import { ChatMessage } from "./ChatMessage";
 import { ConversationList } from "./ConversationList";
 import { DetailPanel } from "./DetailPanel";
+import { EmptyState } from "./EmptyState";
+import { MobileNav, type MobileView } from "./MobileNav";
+import { ThreadView } from "./ThreadView";
+import { TopBar } from "./TopBar";
 import {
   createConversation,
   fetchConversations,
@@ -29,6 +32,18 @@ const STARTER_PROMPTS = [
   "Connect me to a realtor for Austin condos"
 ];
 
+function useMobileLayout() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 1100);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 1100);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return isMobile;
+}
+
 export function Dashboard() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -40,36 +55,56 @@ export function Dashboard() {
   const [assistantBrand, setAssistantBrand] = useState("Real Estate Concierge");
   const [brokerageName, setBrokerageName] = useState("Summit Realty Group");
   const [sourceMode, setSourceMode] = useState("demo_json");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [mobileView, setMobileView] = useState<MobileView>("workspace");
   const endRef = useRef<HTMLDivElement | null>(null);
+  const isMobile = useMobileLayout();
 
   useEffect(() => {
-    void fetchHealth().then((payload) => {
-      setAssistantBrand(payload.assistant_brand);
-      setBrokerageName(payload.brokerage_name);
-      setSourceMode(payload.listing_source_mode);
-    }).catch(() => undefined);
-    void fetchConversations().then((rows) => {
-      setConversations(rows);
-      if (rows.length > 0) {
-        setActiveConversationId(rows[0].id);
-      }
-    }).catch(() => undefined);
+    void fetchHealth()
+      .then((payload) => {
+        setAssistantBrand(payload.assistant_brand);
+        setBrokerageName(payload.brokerage_name);
+        setSourceMode(payload.listing_source_mode);
+      })
+      .catch(() => undefined);
+
+    void fetchConversations()
+      .then((rows) => {
+        setConversations(rows);
+        if (rows.length > 0) {
+          setActiveConversationId(rows[0].id);
+        }
+      })
+      .catch(() => undefined);
   }, []);
 
   useEffect(() => {
     if (!activeConversationId) return;
-    void getHistory(activeConversationId).then((history) => {
-      setMessages(history);
-      const lastAssistant = [...history].reverse().find((row) => row.role === "assistant");
-      setPanelListings(lastAssistant?.listing_results || []);
-      setPanelHandoff(lastAssistant?.handoff || null);
-      setPanelSources(lastAssistant?.sources || []);
-    }).catch(() => setMessages([]));
+    void getHistory(activeConversationId)
+      .then((history) => {
+        setMessages(history);
+        const lastAssistant = [...history].reverse().find((row) => row.role === "assistant");
+        setPanelListings(lastAssistant?.listing_results || []);
+        setPanelHandoff(lastAssistant?.handoff || null);
+        setPanelSources(lastAssistant?.sources || []);
+      })
+      .catch(() => setMessages([]));
   }, [activeConversationId]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileDrawerOpen(false);
+      setMobileSheetOpen(false);
+      setMobileView("workspace");
+    }
+  }, [isMobile]);
 
   const handleNewConversation = async () => {
     const conversationId = await createConversation();
@@ -84,6 +119,14 @@ export function Dashboard() {
     setPanelListings([]);
     setPanelHandoff(null);
     setPanelSources([]);
+    setMobileView("workspace");
+    setMobileDrawerOpen(false);
+  };
+
+  const handleSelectConversation = (conversationId: string) => {
+    setActiveConversationId(conversationId);
+    setMobileView("workspace");
+    setMobileDrawerOpen(false);
   };
 
   const handleSendMessage = async (content: string) => {
@@ -110,6 +153,7 @@ export function Dashboard() {
     };
     setMessages((current) => [...current, userMessage, assistantPlaceholder]);
     setIsLoading(true);
+    setMobileView("workspace");
 
     await sendMessageStream(
       conversationId,
@@ -142,7 +186,11 @@ export function Dashboard() {
         setConversations((current) =>
           current.map((conversation) =>
             conversation.id === conversationId
-              ? { ...conversation, title: conversation.title === "New conversation" ? content.slice(0, 48) : conversation.title, updated_at: new Date().toISOString() }
+              ? {
+                  ...conversation,
+                  title: conversation.title === "New conversation" ? content.slice(0, 48) : conversation.title,
+                  updated_at: new Date().toISOString()
+                }
               : conversation
           )
         );
@@ -163,58 +211,151 @@ export function Dashboard() {
 
   const activePlaceholder = useMemo(() => messages.length === 0, [messages.length]);
 
-  return (
-    <div className="app-shell">
-      <ConversationList
-        conversations={conversations}
-        activeConversationId={activeConversationId}
-        onSelectConversation={setActiveConversationId}
-        onNewConversation={handleNewConversation}
-        assistantBrand={assistantBrand}
-        brokerageName={brokerageName}
-      />
-
-      <main className="chat-shell">
-        <header className="hero">
-          <span className="eyebrow">Standalone trial console</span>
-          <h1>{assistantBrand}</h1>
-          <p>Ask about listings, neighborhoods, buying, renting, short stays, or request a brokerage handoff.</p>
-          <div className="hero-meta">
-            <span>{brokerageName}</span>
-            <span>Listing source mode: {sourceMode}</span>
-          </div>
-        </header>
-
-        <section className="chat-thread">
-          {activePlaceholder ? (
-            <div className="starter-state">
-              <h2>Start with a natural question</h2>
-              <div className="starter-grid">
-                {STARTER_PROMPTS.map((prompt) => (
-                  <button key={prompt} className="secondary-button" onClick={() => void handleSendMessage(prompt)}>
-                    {prompt}
-                  </button>
-                ))}
+  const mobileContent = (() => {
+    switch (mobileView) {
+      case "threads":
+        return (
+          <ConversationList
+            conversations={conversations}
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={() => void handleNewConversation()}
+            assistantBrand={assistantBrand}
+            brokerageName={brokerageName}
+          />
+        );
+      case "listings":
+        return <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} mode="listings" />;
+      case "handoff":
+        return <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} mode="handoff" />;
+      case "sources":
+        return <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} mode="sources" />;
+      case "workspace":
+      default:
+        return (
+          <div className="workspace-header">
+            <div className="workspace-header__intro">
+              <div className="workspace-header__copy">
+                <div className="workspace-header__eyebrow">Agent workspace</div>
+                <div className="workspace-header__title">{assistantBrand}</div>
+                <p className="workspace-header__body">
+                  A structured run surface for listing retrieval, guidance, provenance, and brokerage handoff. The backend streaming and conversation contracts remain unchanged.
+                </p>
+              </div>
+              <div className="workspace-meta">
+                <span className="status-pill status-pill--healthy">healthy</span>
+                <span className="status-pill status-pill--demo">{sourceMode}</span>
               </div>
             </div>
-          ) : (
-            messages.map((message, index) => (
-              <ChatMessage key={`${message.created_at}-${index}`} message={message} assistantLabel={assistantBrand} />
-            ))
-          )}
-          {isLoading && <div className="thinking-indicator">{assistantBrand} is thinking...</div>}
-          <div ref={endRef} />
-        </section>
 
-        <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} />
-      </main>
+            {activePlaceholder ? (
+              <EmptyState prompts={STARTER_PROMPTS} onPrompt={(prompt) => void handleSendMessage(prompt)} />
+            ) : (
+              <>
+                <ThreadView messages={messages} assistantLabel={assistantBrand} isLoading={isLoading} />
+                <div ref={endRef} />
+              </>
+            )}
+          </div>
+        );
+    }
+  })();
 
-      <DetailPanel
-        listings={panelListings}
-        handoff={panelHandoff}
-        sources={panelSources}
-        brokerageName={brokerageName}
-      />
-    </div>
+  return (
+    <>
+      <div className={`app-shell${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
+        <aside className="shell-sidebar">
+          <ConversationList
+            conversations={conversations}
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={() => void handleNewConversation()}
+            assistantBrand={assistantBrand}
+            brokerageName={brokerageName}
+            collapsed={sidebarCollapsed}
+          />
+        </aside>
+
+        <main className="shell-main">
+          <TopBar
+            assistantBrand={assistantBrand}
+            brokerageName={brokerageName}
+            sourceMode={sourceMode}
+            onToggleSidebar={() => setSidebarCollapsed((current) => !current)}
+            onOpenDrawer={() => setMobileDrawerOpen(true)}
+            onOpenSheet={() => setMobileSheetOpen(true)}
+            mobile={isMobile}
+          />
+
+          <section className="workspace">
+            <div className="workspace-scroll">
+              <div className="workspace-inner">
+                {isMobile ? (
+                  mobileContent
+                ) : (
+                  <div className="workspace-header">
+                    <div className="workspace-header__intro">
+                      <div className="workspace-header__copy">
+                        <div className="workspace-header__eyebrow">Agent workspace</div>
+                        <div className="workspace-header__title">{assistantBrand}</div>
+                        <p className="workspace-header__body">
+                          A calm, structured operator surface for real-estate runs. Threads stay dense, listings stay contextual, and handoff remains elevated without disrupting the workspace.
+                        </p>
+                      </div>
+                      <div className="workspace-meta">
+                        <span className="status-pill status-pill--healthy">healthy</span>
+                        <span className="status-pill status-pill--demo">{sourceMode}</span>
+                      </div>
+                    </div>
+
+                    {activePlaceholder ? (
+                      <EmptyState prompts={STARTER_PROMPTS} onPrompt={(prompt) => void handleSendMessage(prompt)} />
+                    ) : (
+                      <>
+                        <ThreadView messages={messages} assistantLabel={assistantBrand} isLoading={isLoading} />
+                        <div ref={endRef} />
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <ChatInput onSend={(value) => void handleSendMessage(value)} disabled={isLoading} sourceMode={sourceMode} />
+          </section>
+        </main>
+
+        <aside className="shell-panel">
+          <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} />
+        </aside>
+      </div>
+
+      {isMobile ? <MobileNav activeView={mobileView} onChange={setMobileView} /> : null}
+
+      {isMobile && mobileDrawerOpen ? (
+        <>
+          <button className="drawer-overlay" onClick={() => setMobileDrawerOpen(false)} aria-label="Close thread drawer" />
+          <div className="drawer">
+            <ConversationList
+              conversations={conversations}
+              activeConversationId={activeConversationId}
+              onSelectConversation={handleSelectConversation}
+              onNewConversation={() => void handleNewConversation()}
+              assistantBrand={assistantBrand}
+              brokerageName={brokerageName}
+            />
+          </div>
+        </>
+      ) : null}
+
+      {isMobile && mobileSheetOpen ? (
+        <>
+          <button className="sheet-overlay" onClick={() => setMobileSheetOpen(false)} aria-label="Close context sheet" />
+          <div className="sheet">
+            <DetailPanel listings={panelListings} handoff={panelHandoff} sources={panelSources} brokerageName={brokerageName} />
+          </div>
+        </>
+      ) : null}
+    </>
   );
 }

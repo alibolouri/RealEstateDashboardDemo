@@ -11,6 +11,7 @@ type Props = {
   onNewConversation: () => void;
   assistantBrand: string;
   brokerageName: string;
+  collapsed?: boolean;
 };
 
 export function ConversationList({
@@ -19,30 +20,41 @@ export function ConversationList({
   onSelectConversation,
   onNewConversation,
   assistantBrand,
-  brokerageName
+  brokerageName,
+  collapsed = false
 }: Props) {
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <span className="eyebrow">White-label concierge</span>
-        <h1>{assistantBrand}</h1>
-        <p>{brokerageName} conversation workspace for listing search and routed human support.</p>
+    <aside className={`sidebar${collapsed ? " sidebar--collapsed" : ""}`}>
+      <div className="sidebar__brand">
+        <div className="sidebar__eyebrow">Agent workspace</div>
+        <div className="sidebar__title">{collapsed ? assistantBrand.slice(0, 2) : assistantBrand}</div>
+        <div className="sidebar__brand-copy">
+          <p className="sidebar__meta">{brokerageName}</p>
+          <p className="sidebar__meta">Threads, runs, listing context, and routed handoff.</p>
+        </div>
       </div>
-      <button className="primary-button" onClick={onNewConversation}>
-        New conversation
+
+      <button className="button button--primary" onClick={onNewConversation}>
+        <span className="button__label">New conversation</span>
+        {collapsed ? "+" : null}
       </button>
-      <div className="conversation-group">
-        {conversations.map((conversation) => (
-          <button
-            key={conversation.id}
-            className={`conversation-item${activeConversationId === conversation.id ? " active" : ""}`}
-            onClick={() => onSelectConversation(conversation.id)}
-          >
-            <strong>{conversation.title || "New conversation"}</strong>
-            <span>{new Date(conversation.updated_at).toLocaleString()}</span>
-          </button>
-        ))}
-      </div>
+
+      <section className="sidebar__section">
+        <div className="sidebar__section-title">Threads</div>
+        <div className="conversation-list">
+          {conversations.map((conversation) => (
+            <button
+              key={conversation.id}
+              className={`conversation-row${activeConversationId === conversation.id ? " is-active" : ""}`}
+              onClick={() => onSelectConversation(conversation.id)}
+              aria-label={conversation.title || "New conversation"}
+            >
+              <div className="conversation-row__title">{conversation.title || "New conversation"}</div>
+              <div className="conversation-row__time">{new Date(conversation.updated_at).toLocaleString()}</div>
+            </button>
+          ))}
+        </div>
+      </section>
     </aside>
   );
 }

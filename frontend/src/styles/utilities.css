@@ -1,0 +1,15 @@
+.u-muted {
+  color: var(--text-secondary);
+}
+
+.u-tertiary {
+  color: var(--text-tertiary);
+}
+
+.u-quaternary {
+  color: var(--text-quaternary);
+}
+
+.u-hidden {
+  display: none !important;
+}
