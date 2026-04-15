@@ -200,11 +200,16 @@ export function Dashboard() {
     setMobileDrawerOpen(false);
   };
 
-  const handleLogout = () => {
-    void logoutAdmin().catch(() => undefined);
+  const handleLogout = async () => {
+    stopStreamAnimator();
+    streamQueueRef.current = "";
+    streamMetaRef.current = null;
+    streamFinalizeRef.current = null;
+    setIsLoading(false);
+    await logoutAdmin().catch(() => undefined);
     setActiveConversationId(null);
     setMessages([]);
-    navigateTo("workspace");
+    navigateTo("settings");
     setMobileDrawerOpen(false);
   };
 
