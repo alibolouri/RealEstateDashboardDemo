@@ -13,6 +13,7 @@ type Props = {
   onLogout: () => void;
   assistantBrand: string;
   brokerageName: string;
+  canManageSettings?: boolean;
 };
 
 export function ConversationList({
@@ -23,7 +24,8 @@ export function ConversationList({
   onOpenSettings,
   onLogout,
   assistantBrand,
-  brokerageName
+  brokerageName,
+  canManageSettings = false
 }: Props) {
   return (
     <aside className="sidebar">
@@ -62,9 +64,11 @@ export function ConversationList({
       </section>
 
       <div className="sidebar__footer">
-        <button className="button button--secondary sidebar__logout" onClick={onOpenSettings} aria-label="Open runtime settings">
-          <span className="button__label">Settings</span>
-        </button>
+        {canManageSettings ? (
+          <button className="button button--secondary sidebar__logout" onClick={onOpenSettings} aria-label="Open runtime settings">
+            <span className="button__label">Settings</span>
+          </button>
+        ) : null}
         <button className="button button--secondary sidebar__logout" onClick={onLogout} aria-label="Clear active workspace">
           <span className="button__label">Log out</span>
         </button>

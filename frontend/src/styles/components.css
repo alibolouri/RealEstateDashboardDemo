@@ -244,6 +244,49 @@
   padding-bottom: var(--space-6);
 }
 
+.auth-shell {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.auth-panel {
+  width: min(100%, 480px);
+  padding: var(--space-6);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.auth-panel__eyebrow {
+  font-size: var(--label-size);
+  line-height: var(--label-line);
+  font-weight: var(--label-weight);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-secondary);
+}
+
+.auth-panel__title {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 620;
+  letter-spacing: var(--tracking-heading);
+}
+
+.auth-panel__body {
+  color: var(--text-secondary);
+}
+
+.auth-panel__form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.auth-panel__submit {
+  width: 100%;
+}
+
 .settings-page__header {
   display: grid;
   gap: var(--space-2);

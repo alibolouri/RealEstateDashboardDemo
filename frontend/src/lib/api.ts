@@ -102,6 +102,8 @@ export type SettingsPayload = {
 export type AdminSession = {
   authenticated: boolean;
   username?: string | null;
+  role?: string | null;
+  can_manage_settings: boolean;
 };
 
 async function apiFetch(path: string, init?: RequestInit, includeCredentials = false): Promise<Response> {

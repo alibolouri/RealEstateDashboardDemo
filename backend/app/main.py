@@ -210,19 +210,24 @@ async def admin_login(request: Request, credentials: AdminLoginRequest) -> Admin
     if not compare_digest(credentials.username, ADMIN_USERNAME) or not compare_digest(credentials.password, ADMIN_PASSWORD):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin credentials")
     request.session["admin_username"] = credentials.username
-    return AdminSessionResponse(authenticated=True, username=credentials.username)
+    return AdminSessionResponse(authenticated=True, username=credentials.username, role="admin", can_manage_settings=True)
 
 
 @app.post("/admin/logout", response_model=AdminSessionResponse)
 async def admin_logout(request: Request) -> AdminSessionResponse:
     request.session.clear()
-    return AdminSessionResponse(authenticated=False, username=None)
+    return AdminSessionResponse(authenticated=False, username=None, role=None, can_manage_settings=False)
 
 
 @app.get("/admin/session", response_model=AdminSessionResponse)
 async def admin_session(request: Request) -> AdminSessionResponse:
     username = request.session.get("admin_username")
-    return AdminSessionResponse(authenticated=bool(username), username=username)
+    return AdminSessionResponse(
+        authenticated=bool(username),
+        username=username,
+        role="admin" if username else None,
+        can_manage_settings=bool(username),
+    )
 
 
 @app.get("/conversations")

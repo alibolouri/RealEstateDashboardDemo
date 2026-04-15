@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { AuthScreen } from "./AuthScreen";
 import { ChatInput } from "./ChatInput";
 import { ConversationList } from "./ConversationList";
 import { EmptyState } from "./EmptyState";
@@ -8,11 +9,13 @@ import { ThreadView } from "./ThreadView";
 import { TopBar } from "./TopBar";
 import {
   createConversation,
+  fetchAdminSession,
   fetchConversations,
   fetchHealth,
   getHistory,
   logoutAdmin,
   sendMessageStream,
+  type AdminSession,
   type Message,
 } from "../lib/api";
 
@@ -43,6 +46,8 @@ function useMobileLayout() {
 
 export function Dashboard() {
   const initialView = window.location.pathname === "/settings" ? "settings" : "workspace";
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [session, setSession] = useState<AdminSession>({ authenticated: false, can_manage_settings: false });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -125,23 +130,58 @@ export function Dashboard() {
         setBrokerageName(payload.brokerage_name);
       })
       .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrapSession() {
+      try {
+        const nextSession = await fetchAdminSession();
+        if (!cancelled) {
+          setSession(nextSession);
+        }
+      } catch {
+        if (!cancelled) {
+          setSession({ authenticated: false, can_manage_settings: false });
+        }
+      } finally {
+        if (!cancelled) {
+          setSessionLoading(false);
+        }
+      }
+    }
+
+    void bootstrapSession();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!session.authenticated) {
+      setConversations([]);
+      setActiveConversationId(null);
+      setMessages([]);
+      return;
+    }
 
     void fetchConversations()
       .then((rows) => {
         setConversations(rows);
         if (rows.length > 0) {
-          setActiveConversationId(rows[0].id);
+          setActiveConversationId((current) => current ?? rows[0].id);
         }
       })
       .catch(() => undefined);
-  }, []);
+  }, [session.authenticated]);
 
   useEffect(() => {
-    if (!activeConversationId) return;
+    if (!session.authenticated || !activeConversationId) return;
     void getHistory(activeConversationId)
       .then((history) => setMessages(history))
       .catch(() => setMessages([]));
-  }, [activeConversationId]);
+  }, [session.authenticated, activeConversationId]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -152,6 +192,13 @@ export function Dashboard() {
       setMobileDrawerOpen(false);
     }
   }, [isMobile]);
+
+  useEffect(() => {
+    if (session.authenticated && !session.can_manage_settings && view === "settings") {
+      window.history.replaceState({}, "", "/");
+      setView("workspace");
+    }
+  }, [session.authenticated, session.can_manage_settings, view]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -172,6 +219,12 @@ export function Dashboard() {
     window.history.pushState({}, "", path);
     setView(nextView);
     setMobileDrawerOpen(false);
+  };
+
+  const refreshSession = async () => {
+    const nextSession = await fetchAdminSession();
+    setSession(nextSession);
+    return nextSession;
   };
 
   const handleNewConversation = async () => {
@@ -207,6 +260,8 @@ export function Dashboard() {
     streamFinalizeRef.current = null;
     setIsLoading(false);
     await logoutAdmin().catch(() => undefined);
+    setSession({ authenticated: false, can_manage_settings: false, role: null, username: null });
+    setConversations([]);
     setActiveConversationId(null);
     setMessages([]);
     navigateTo("settings");
@@ -294,6 +349,33 @@ export function Dashboard() {
 
   const activePlaceholder = useMemo(() => messages.length === 0, [messages.length]);
 
+  if (sessionLoading) {
+    return (
+      <main className="auth-shell">
+        <section className="panel auth-panel">
+          <div className="auth-panel__eyebrow">Loading session</div>
+          <h1 className="auth-panel__title">{assistantBrand}</h1>
+          <p className="auth-panel__body">Checking the current session before loading the workspace.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!session.authenticated) {
+    return (
+      <AuthScreen
+        assistantBrand={assistantBrand}
+        brokerageName={brokerageName}
+        onAuthenticated={async () => {
+          const nextSession = await refreshSession();
+          if (nextSession.authenticated) {
+            navigateTo("workspace");
+          }
+        }}
+      />
+    );
+  }
+
   const workspaceContent = (
     <div className="workspace-header">
       <div className="workspace-header__intro">
@@ -332,6 +414,7 @@ export function Dashboard() {
             onLogout={handleLogout}
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
+            canManageSettings={session.can_manage_settings}
           />
         </aside>
 
@@ -347,12 +430,14 @@ export function Dashboard() {
             <div className="workspace-scroll">
               <div className="workspace-inner">
                 {view === "settings" ? (
-                  <SettingsPage
-                    onRuntimeBrandingChange={(nextAssistantBrand, nextBrokerageName) => {
-                      setAssistantBrand(nextAssistantBrand);
-                      setBrokerageName(nextBrokerageName);
-                    }}
-                  />
+                  session.can_manage_settings ? (
+                    <SettingsPage
+                      onRuntimeBrandingChange={(nextAssistantBrand, nextBrokerageName) => {
+                        setAssistantBrand(nextAssistantBrand);
+                        setBrokerageName(nextBrokerageName);
+                      }}
+                    />
+                  ) : null
                 ) : (
                   workspaceContent
                 )}
@@ -377,6 +462,7 @@ export function Dashboard() {
               onLogout={handleLogout}
               assistantBrand={assistantBrand}
               brokerageName={brokerageName}
+              canManageSettings={session.can_manage_settings}
             />
           </div>
         </>

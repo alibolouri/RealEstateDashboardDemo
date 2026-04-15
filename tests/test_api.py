@@ -136,11 +136,17 @@ def test_admin_session_and_logout(client):
     login_admin(client)
     session_response = client.get("/admin/session")
     assert session_response.status_code == 200
-    assert session_response.json()["authenticated"] is True
+    session_payload = session_response.json()
+    assert session_payload["authenticated"] is True
+    assert session_payload["role"] == "admin"
+    assert session_payload["can_manage_settings"] is True
 
     logout_response = client.post("/admin/logout")
     assert logout_response.status_code == 200
-    assert logout_response.json()["authenticated"] is False
+    logout_payload = logout_response.json()
+    assert logout_payload["authenticated"] is False
+    assert logout_payload["role"] is None
+    assert logout_payload["can_manage_settings"] is False
 
 
 def test_seeded_demo_conversations_load_with_sources_and_handoff(seeded_client):

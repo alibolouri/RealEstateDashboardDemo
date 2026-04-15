@@ -1,12 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-import {
-  fetchAdminSession,
-  fetchSettings,
-  loginAdmin,
-  saveSettings,
-  type SettingsPayload,
-} from "../lib/api";
+import { fetchSettings, saveSettings, type SettingsPayload } from "../lib/api";
 
 type Props = {
   onRuntimeBrandingChange: (assistantBrand: string, brokerageName: string) => void;
@@ -30,10 +24,8 @@ function valueMap(payload: SettingsPayload | null): Record<string, string | null
 export function SettingsPage({ onRuntimeBrandingChange }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
   const [payload, setPayload] = useState<SettingsPayload | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const [loginValues, setLoginValues] = useState({ username: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -54,16 +46,10 @@ export function SettingsPage({ onRuntimeBrandingChange }: Props) {
     async function bootstrap() {
       try {
         setLoading(true);
-        const session = await fetchAdminSession();
-        if (cancelled) return;
-        setAuthenticated(session.authenticated);
-        if (session.authenticated) {
-          await loadSettings();
-        }
+        await loadSettings();
       } catch {
         if (!cancelled) {
-          setAuthenticated(false);
-          setError(null);
+          setError("Settings are unavailable until an admin session is active.");
         }
       } finally {
         if (!cancelled) {
@@ -77,23 +63,6 @@ export function SettingsPage({ onRuntimeBrandingChange }: Props) {
       cancelled = true;
     };
   }, [onRuntimeBrandingChange]);
-
-  const handleLogin = async (event: FormEvent) => {
-    event.preventDefault();
-    setError(null);
-    setNotice(null);
-    try {
-      setLoading(true);
-      await loginAdmin(loginValues.username, loginValues.password);
-      setAuthenticated(true);
-      await loadSettings();
-      setLoginValues({ username: "", password: "" });
-    } catch {
-      setError("Admin login failed. Check the configured admin credentials and try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSave = async (event: FormEvent) => {
     event.preventDefault();
@@ -144,50 +113,15 @@ export function SettingsPage({ onRuntimeBrandingChange }: Props) {
     );
   }
 
-  if (!authenticated) {
+  if (!payload) {
     return (
       <div className="settings-page">
         <div className="settings-page__header">
           <div className="workspace-header__eyebrow">Settings</div>
-          <div className="workspace-header__title">Admin sign in</div>
-          <p className="workspace-header__body">The public chat remains open. Only runtime configuration is protected.</p>
+          <div className="workspace-header__title">Runtime configuration</div>
+          <p className="workspace-header__body">An admin session is required before runtime settings can be loaded.</p>
         </div>
-
-        <form className="panel settings-panel settings-login" onSubmit={handleLogin}>
-          <div className="settings-login__grid">
-            <label className="settings-field">
-              <span className="settings-field__label">Admin username</span>
-              <input
-                className="settings-field__input"
-                type="text"
-                value={loginValues.username}
-                onChange={(event) => setLoginValues((current) => ({ ...current, username: event.target.value }))}
-                autoComplete="username"
-                required
-              />
-            </label>
-
-            <label className="settings-field">
-              <span className="settings-field__label">Admin password</span>
-              <input
-                className="settings-field__input"
-                type="password"
-                value={loginValues.password}
-                onChange={(event) => setLoginValues((current) => ({ ...current, password: event.target.value }))}
-                autoComplete="current-password"
-                required
-              />
-            </label>
-          </div>
-
-          {error ? <div className="callout-note settings-notice settings-notice--danger">{error}</div> : null}
-
-          <div className="settings-actions">
-            <button className="button button--primary" type="submit">
-              Sign in
-            </button>
-          </div>
-        </form>
+        {error ? <div className="callout-note settings-notice settings-notice--danger">{error}</div> : null}
       </div>
     );
   }
@@ -203,7 +137,7 @@ export function SettingsPage({ onRuntimeBrandingChange }: Props) {
       </div>
 
       <form className="settings-stack" onSubmit={handleSave}>
-        {payload?.groups.map((group) => (
+        {payload.groups.map((group) => (
           <section className="panel settings-panel" key={group.id}>
             <div className="settings-panel__header">
               <div>

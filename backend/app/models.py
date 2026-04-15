@@ -205,3 +205,5 @@ class AdminLoginRequest(BaseModel):
 class AdminSessionResponse(BaseModel):
     authenticated: bool
     username: str | None = None
+    role: str | None = None
+    can_manage_settings: bool = False
