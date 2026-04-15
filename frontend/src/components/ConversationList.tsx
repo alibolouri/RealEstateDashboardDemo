@@ -11,10 +11,8 @@ type Props = {
   onNewConversation: () => void;
   onOpenSettings: () => void;
   onLogout: () => void;
-  onToggleCollapse?: () => void;
   assistantBrand: string;
   brokerageName: string;
-  collapsed?: boolean;
 };
 
 export function ConversationList({
@@ -24,37 +22,22 @@ export function ConversationList({
   onNewConversation,
   onOpenSettings,
   onLogout,
-  onToggleCollapse,
   assistantBrand,
-  brokerageName,
-  collapsed = false
+  brokerageName
 }: Props) {
   return (
-    <aside className={`sidebar${collapsed ? " sidebar--collapsed" : ""}`}>
-      <div className="sidebar__topbar">
-        <div className="sidebar__brand">
-          <div className="sidebar__eyebrow">Agent workspace</div>
-          <div className="sidebar__title">{collapsed ? assistantBrand.slice(0, 2) : assistantBrand}</div>
-          <div className="sidebar__brand-copy">
-            <p className="sidebar__meta">{brokerageName}</p>
-            <p className="sidebar__meta">Threads, runs, listing context, and routed handoff.</p>
-          </div>
+    <aside className="sidebar">
+      <div className="sidebar__brand">
+        <div className="sidebar__eyebrow">Agent workspace</div>
+        <div className="sidebar__title">{assistantBrand}</div>
+        <div className="sidebar__brand-copy">
+          <p className="sidebar__meta">{brokerageName}</p>
+          <p className="sidebar__meta">Threads, runs, listing context, and routed handoff.</p>
         </div>
-        {onToggleCollapse ? (
-          <button
-            className="button button--ghost button--icon sidebar__collapse-toggle desktop-only"
-            onClick={onToggleCollapse}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <span className={`sidebar__collapse-chevron${collapsed ? " is-collapsed" : ""}`} aria-hidden="true" />
-          </button>
-        ) : null}
       </div>
 
       <button className="button button--primary" onClick={onNewConversation}>
         <span className="button__label">New conversation</span>
-        {collapsed ? "+" : null}
       </button>
 
       <section className="sidebar__section">
@@ -81,11 +64,9 @@ export function ConversationList({
       <div className="sidebar__footer">
         <button className="button button--secondary sidebar__logout" onClick={onOpenSettings} aria-label="Open runtime settings">
           <span className="button__label">Settings</span>
-          {collapsed ? ">" : null}
         </button>
         <button className="button button--secondary sidebar__logout" onClick={onLogout} aria-label="Clear active workspace">
           <span className="button__label">Log out</span>
-          {collapsed ? ">" : null}
         </button>
       </div>
     </aside>

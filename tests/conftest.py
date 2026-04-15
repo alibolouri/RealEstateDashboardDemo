@@ -12,8 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-@pytest.fixture()
-def client(monkeypatch):
+def _build_client(monkeypatch, *, seed_demo_conversations: str):
     runtime_dir = ROOT / ".test-runtime"
     runtime_dir.mkdir(exist_ok=True)
     db_path = runtime_dir / f"{uuid.uuid4().hex}.db"
@@ -25,7 +24,7 @@ def client(monkeypatch):
     monkeypatch.setenv("ADMIN_USERNAME", "admin")
     monkeypatch.setenv("ADMIN_PASSWORD", "secret-pass")
     monkeypatch.setenv("SESSION_SECRET", "test-session-secret")
-    monkeypatch.setenv("SEED_DEMO_CONVERSATIONS", "0")
+    monkeypatch.setenv("SEED_DEMO_CONVERSATIONS", seed_demo_conversations)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     for module_name in list(sys.modules):
@@ -39,3 +38,13 @@ def client(monkeypatch):
     database_module.engine.dispose()
     if db_path.exists():
         db_path.unlink(missing_ok=True)
+
+
+@pytest.fixture()
+def client(monkeypatch):
+    yield from _build_client(monkeypatch, seed_demo_conversations="0")
+
+
+@pytest.fixture()
+def seeded_client(monkeypatch):
+    yield from _build_client(monkeypatch, seed_demo_conversations="1")

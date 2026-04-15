@@ -141,3 +141,31 @@ def test_admin_session_and_logout(client):
     logout_response = client.post("/admin/logout")
     assert logout_response.status_code == 200
     assert logout_response.json()["authenticated"] is False
+
+
+def test_seeded_demo_conversations_load_with_sources_and_handoff(seeded_client):
+    conversations = seeded_client.get("/conversations").json()["conversations"]
+    assert len(conversations) == 4
+    assert conversations[0]["title"] == "Seller prep and brokerage handoff"
+
+    history = seeded_client.get("/conversations/demo-conv-houston-buyer/history").json()["messages"]
+    assert len(history) == 6
+
+    assistant_message = history[-1]
+    assert assistant_message["sources"]
+    assert assistant_message["sources"][0]["url"] == "https://www.reso.org/reso-web-api/"
+    assert assistant_message["handoff"]["fixed_contact_number"] == "+1-800-TEST"
+    assert assistant_message["handoff"]["recommended_realtor"]["brokerage"] == "Test Brokerage"
+
+
+def test_demo_seeding_is_idempotent_and_uses_runtime_placeholders(seeded_client):
+    database_module = __import__("backend.app.database", fromlist=["init_db"])
+    database_module.init_db()
+
+    conversations = seeded_client.get("/conversations").json()["conversations"]
+    assert len(conversations) == 4
+
+    history = seeded_client.get("/conversations/demo-conv-seller-handoff/history").json()["messages"]
+    assistant_message = history[-1]
+    assert assistant_message["handoff"]["fixed_contact_number"] == "+1-800-TEST"
+    assert assistant_message["handoff"]["recommended_realtor"]["brokerage"] == "Test Brokerage"

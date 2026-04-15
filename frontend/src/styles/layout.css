@@ -4,11 +4,6 @@
   height: 100dvh;
   background: transparent;
   overflow: hidden;
-  transition: grid-template-columns var(--duration-standard) var(--ease-standard);
-}
-
-.app-shell--sidebar-collapsed {
-  grid-template-columns: 92px minmax(0, 1fr);
 }
 
 .shell-sidebar {

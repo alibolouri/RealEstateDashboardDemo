@@ -43,7 +43,6 @@ function useMobileLayout() {
 
 export function Dashboard() {
   const initialView = window.location.pathname === "/settings" ? "settings" : "workspace";
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -317,7 +316,7 @@ export function Dashboard() {
 
   return (
     <>
-      <div className={`app-shell${sidebarCollapsed ? " app-shell--sidebar-collapsed" : ""}`}>
+      <div className="app-shell">
         <aside className="shell-sidebar">
           <ConversationList
             conversations={conversations}
@@ -326,10 +325,8 @@ export function Dashboard() {
             onNewConversation={() => void handleNewConversation()}
             onOpenSettings={() => navigateTo("settings")}
             onLogout={handleLogout}
-            onToggleCollapse={() => setSidebarCollapsed((current) => !current)}
             assistantBrand={assistantBrand}
             brokerageName={brokerageName}
-            collapsed={sidebarCollapsed}
           />
         </aside>
 
@@ -375,7 +372,6 @@ export function Dashboard() {
               onLogout={handleLogout}
               assistantBrand={assistantBrand}
               brokerageName={brokerageName}
-              collapsed={false}
             />
           </div>
         </>
