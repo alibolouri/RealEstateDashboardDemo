@@ -540,11 +540,12 @@
   background: rgba(94, 106, 210, 0.08);
   border-color: rgba(94, 106, 210, 0.18);
   max-width: 760px;
-  justify-self: start;
+  justify-self: end;
 }
 
 .run-block--assistant {
   background: var(--bg-surface-1);
+  justify-self: start;
 }
 
 .run-block--streaming {
